@@ -11,19 +11,28 @@ async function uploadImageUrlsToTable() {
       .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET as string)
       .list()
     console.log('storage',files);
-    
+
     if (error) throw error
     for (const file of files) {
       
       if (file.name.match(/\.(jpg|jpeg|png|gif|HEIC)$/i)) {
-        const imageUrl = getImageUrl(file.name)
+        console.log(file);
         
-        const { data, error } = await supabase
+        // Generate public URL for the file
+        const { data } = supabase
+          .storage
+          .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET as string)
+          .getPublicUrl(file.name)
+        
+        const publicUrl = data.publicUrl
+        
+        // Insert the public URL into the database
+        const { data: insertData, error: insertError } = await supabase
           .from('image_gallery')
           .insert([
             { 
               file_name: file.name, 
-              public_url: imageUrl,
+              public_url: publicUrl,
             }
           ])
         

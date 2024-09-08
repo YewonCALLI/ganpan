@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import ImageUploadPage from './uploadButton';
+import ImageGallery from './ImageGallery';
 
-import getImageUrl from '@/utils/supabase/storage';
 export default async function Notes() {
 
     const supabase = createClient();
@@ -10,5 +10,6 @@ export default async function Notes() {
     return (<>
         <pre>{JSON.stringify(notes, null, 2)}</pre>
         <ImageUploadPage />
+        <ImageGallery />
     </>)
 }
