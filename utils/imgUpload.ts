@@ -1,12 +1,9 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { Database } from "@/lib/database.types"; // Supabase 타입 정의
+import supabase from "./supabase/supabaseClient";
 import fs from 'fs/promises';
 import path from 'path';
 
 export async function uploadImageToSupabase(imagePath: string) {
-  const supabase = createServerComponentClient<Database>({ cookies });
-  
+      
   try {
     // 파일 읽기
     const fileBuffer = await fs.readFile(imagePath);
