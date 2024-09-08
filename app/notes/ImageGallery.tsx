@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { Grid } from 'lucide-react';
 
 interface ImageData {
     file_name: string;
@@ -29,12 +30,15 @@ const ImageGallery: React.FC = () => {
             {result.length === 0 ? (
                 <div>No result found</div>
             ) : (
-                result.map((image, index) => (
-                    <img
-                        src={image.public_url}
-                        alt={image.file_name}
-                    />
-                ))
+                <div class="grid grid-cols-6">
+                    {
+                        result.map((image, index) => (
+                            <img
+                                src={image.public_url}
+                                alt={image.file_name}
+                            />
+                        ))
+                    }</div>
             )}
         </>
     );
