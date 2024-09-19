@@ -10,13 +10,13 @@ async function uploadImageUrlsToTable() {
       .storage
       .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET as string)
       .list()
-    console.log('storage',files);
 
+    
     if (error) throw error
     for (const file of files) {
       
-      if (file.name.match(/\.(jpg|jpeg|png|gif|HEIC)$/i)) {
-        console.log(file);
+      if (file.name.match(/\.(jpg|jpeg|JPG|png|gif|HEIC)$/i)) {
+      
         
         // Generate public URL for the file
         const { data } = supabase
@@ -25,28 +25,54 @@ async function uploadImageUrlsToTable() {
           .getPublicUrl(file.name)
         
         const publicUrl = data.publicUrl
-        
-        // Insert the public URL into the database
-        const { data: insertData, error: insertError } = await supabase
+        console.log('url',publicUrl);
+        console.log(file.name);
+      
+        if(file.name.includes("-")){
+          const parent = file.name.split("-")[0];
+          const tmp = file.name.split("-")[2];
+          const last = tmp.split(".")[0]
+          
+          // Insert the public URL into the database
+          const { data: insertData, error: insertError } = await supabase
           .from('image_gallery')
           .insert([
             { 
               file_name: file.name, 
               public_url: publicUrl,
+              fk_parent_id : parent,
+              character:last,
             }
           ])
+        }
+        if(!file.name.includes("-")){
+          console.log('hey~');
+          
+            // Insert the public URL into the database
+          const { data: insertData, error: insertError } = await supabase
+          .from('parent_image_gallery')
+          .insert([
+            { 
+              file_name: file.name,
+              public_url: publicUrl,
+            }
+          ])
+        }
+        
         
         if (error) throw error
         results.push(`Uploaded URL for ${file.name}`)
       }
     }
-
     return { success: true, message: 'All image URLs have been uploaded to the table.', results }
   } catch (error) {
     console.error('Error:', error)
     return { success: false, message: 'An error occurred while uploading image URLs.', error: String(error) }
   }
 }
+
+
+
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
