@@ -4,16 +4,17 @@ import supabase from '@/utils/supabase/supabaseClient'
 
 async function getImageUrls() {
   const results = [];
-  
+        
   try {
-    const { data: image_gallery, error } = await supabase
-    .from('image_gallery')
+    const { data: parent_image_gallery, error } = await supabase
+    .from('parent_image_gallery')
     .select('*')
           
     if (error) throw error
-    for (const file of image_gallery) {
+    for (const file of parent_image_gallery) {
         if (error) throw error
         results.push(file)
+      
     }
     return { success: true, message: 'All image URLS donw', results }
   } catch (error) {

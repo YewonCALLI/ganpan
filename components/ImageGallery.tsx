@@ -11,6 +11,17 @@ interface ImageData {
 const ImageGallery: React.FC = () => {
     const [result, setResult] = useState<ImageData[]>([])
 
+    const fetchParentImages = async () => {
+        try {
+            const response = await fetch('/api/get-parent-image-urls', { method: 'GET' })
+            const data = await response.json()
+            setResult(data.results || [])
+
+        } catch (error) {
+            setResult('An error occurred')
+        }
+    }
+
     const fetchImages = async () => {
         try {
             const response = await fetch('/api/get-image-urls', { method: 'GET' })
@@ -21,18 +32,22 @@ const ImageGallery: React.FC = () => {
             setResult('An error occurred')
         }
     }
+
     useEffect(() => {
-        fetchImages()
+        fetchImages();
+        fetchParentImages();
+        console.log(result);
+        
     }, [])
 
     return (
         <>
-            {result.length === 0 ? (
+            {result?.length === 0 ? (
                 <div>No result found</div>
             ) : (
                 <div class="grid grid-cols-6">
                     {
-                        result.map((image, index) => (
+                        result?.map((image, index) => (
                             <img
                                 src={image.public_url}
                                 alt={image.file_name}
