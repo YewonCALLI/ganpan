@@ -15,7 +15,7 @@ async function uploadImageUrlsToTable() {
     if (error) throw error
     for (const file of files) {
       
-      if (file.name.match(/\.(jpg|jpeg|png|gif|HEIC)$/i)) {
+      if (file.name.match(/\.(jpg|jpeg|png|gif|HEIC|JPG)$/i)) {
         console.log(file);
         
         // Generate public URL for the file
