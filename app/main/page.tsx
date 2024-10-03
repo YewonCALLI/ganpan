@@ -6,7 +6,8 @@ export default async function Main() {
 
 
     return (<>
-        <ImageUploadPage />
-        <ImageGallery />
+    
+        {/* <ImageUploadPage />
+        <ImageGallery /> */}
     </>)
 }
