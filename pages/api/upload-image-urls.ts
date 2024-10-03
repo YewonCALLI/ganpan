@@ -9,10 +9,15 @@ async function uploadImageUrlsToTable() {
     const { data: files, error } = await supabase
       .storage
       .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET as string)
-      .list()
+      .list('', {
+        limit: 10000,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+      })
 
     
     if (error) throw error
+    
     for (const file of files) {
       
       if (file.name.match(/\.(jpg|jpeg|JPG|png|gif|HEIC)$/i)) {
@@ -64,7 +69,10 @@ async function uploadImageUrlsToTable() {
         results.push(`Uploaded URL for ${file.name}`)
       }
     }
-    return { success: true, message: 'All image URLs have been uploaded to the table.', results }
+    // console.log(files.length);
+    
+    return { success: true, message: 'All image URLs have been uploaded to the table.', files }
+
   } catch (error) {
     console.error('Error:', error)
     return { success: false, message: 'An error occurred while uploading image URLs.', error: String(error) }

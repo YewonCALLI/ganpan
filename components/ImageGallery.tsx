@@ -34,10 +34,10 @@ const ImageGallery: React.FC = () => {
     }
 
     useEffect(() => {
-        fetchImages();
+        // fetchImages();
         fetchParentImages();
         console.log(result);
-        
+
     }, [])
 
     return (
