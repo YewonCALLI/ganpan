@@ -1,0 +1,97 @@
+@font-face {
+    font-family: 'CustomFont';
+    src: url('/HeadlineAM.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+.title{
+    font-family: 'CustomFont';
+    font-size: 3em;
+    color: #00D5FF;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+.header{
+    position: absolute;
+    display: flex;
+    top:3.0%;
+    right: 2.4%;
+    align-items: center;
+    gap: 10px;
+    height: 3.9%;
+    cursor: pointer;
+}
+.header :hover{
+    opacity: 0.85;
+}
+.header img{
+    position: relative;
+    height: 90%;
+    width: auto;
+}
+.page1{
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+.page2{
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+.pencil{
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    width: 80%;
+    transform: translate(-50%, 0%);
+}
+.pencil2{
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    width: 80%;
+    transform: translate(-50%, 0%);
+}
+.complete_icon{
+    position: absolute;
+    top: 80%;
+    width: 23.8%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+.complete_icon :hover{
+    opacity: 0.85;
+}
+.text-type1{
+    position: absolute;
+    top:90%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+.result{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+}
+.page2-buttons{
+    position: absolute;
+    display: flex;
+    top:80%;
+    left: 50%;
+    gap:30px;
+    transform: translate(-50%, 0%);
+    width: 50%;
+}
+
+.page2-buttons :hover{
+    opacity: 0.85;
+}
