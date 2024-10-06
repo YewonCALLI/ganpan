@@ -43,11 +43,13 @@ function page2() {
         src={storebutton}
         alt="store"
         quality={75}
+        style={{cursor: 'pointer'}}
         />
         <Image
         src={sendbutton}
         alt="send"
         quality={75}
+        style={{cursor: 'pointer'}}
         />
 
       </div>

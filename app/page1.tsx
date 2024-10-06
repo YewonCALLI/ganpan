@@ -7,8 +7,9 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import '../app/app.css';
 import Image from 'next/image';
-import image1 from '@/background1.png';
+import image1 from '@/background.png';
 import pencil from '@/Group 6.svg';
+import localFont from 'next/font/local';
 import completeicon from '@/Group 5 1.svg';
 
 
@@ -21,6 +22,9 @@ function page1() {
 
   return (
     <div className="page1">
+      <div className='title' style={{ fontFamily: 'CustomFont' }}>
+        <p>문구를 작성하세요</p>
+      </div>
       <div className="pencil">
         {/* 연필 이미지 아이콘 추가 */}
         {[...Array(1)].map((_, index) => (
@@ -49,6 +53,7 @@ function page1() {
         alt="pencil icon" 
         quality={75} 
         onClick={handleImageClick}
+        style={{cursor: 'pointer'}}
         />
       </div>
       <div className='text-type1' style={{fontWeight:'300', color: '#292929'}}>
