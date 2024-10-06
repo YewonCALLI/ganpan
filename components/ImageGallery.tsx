@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { Grid } from 'lucide-react';
 
@@ -10,6 +10,7 @@ interface ImageData {
 
 const ImageGallery: React.FC = () => {
     const [result, setResult] = useState<ImageData[]>([])
+    const [inputValue, setInputValue] = useState('');
 
     const fetchParentImages = async () => {
         try {
@@ -29,23 +30,46 @@ const ImageGallery: React.FC = () => {
             setResult(data.results || [])
 
         } catch (error) {
-            setResult('An error occurred')
+            setResult([])
         }
     }
 
-    useEffect(() => {
-        fetchImages();
-        fetchParentImages();
-        console.log(result);
-        
-    }, [])
+
+    const fetchSearchedImages = async (userInput: string) => {
+        try {
+            const response = await fetch(`/api/get-search-image?input=${encodeURIComponent(userInput)}`, { method: 'GET' })
+            const data = await response.json()
+            setResult(data.results || [])
+        } catch (error) {
+            console.log(error);
+
+            setResult([])
+        }
+    }
+    const handleChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setInputValue(e.target.value);
+        },
+        []);
+
+    const handleComplete = useCallback(
+        (e: React.KeyboardEvent | React.MouseEvent) => {
+            if ('key' in e && e.key === 'Enter' || e.type === 'click') {
+                fetchSearchedImages(inputValue)
+            }
+        },
+        [inputValue]);
+
+    // useEffect(() => { fetchSearchedImages(inputValue) }, [inputValue])
 
     return (
         <>
+            <input type="text" onChange={handleChange} onKeyDown={handleComplete}
+                value={inputValue} className="border-b" />
             {result?.length === 0 ? (
                 <div>No result found</div>
             ) : (
-                <div class="grid grid-cols-6">
+                <div className="grid grid-cols-6">
                     {
                         result?.map((image, index) => (
                             <img
