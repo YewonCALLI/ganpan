@@ -1,21 +1,20 @@
-"use client";
-
 import dynamic from 'next/dynamic';
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import '../app/app.css';
+import '../../app/app.css';
 import Image from 'next/image';
 import image1 from '@/background.png';
 import storeImage from '@/sample.png';
 import originImage from '@/sample2.png';
 import storebutton from '@/store_icon.png';
 import sendbutton from '@/send_icon.png';
+import Header from '@/components/Header';
 
 
 function page2() {
   return (
+    <>
+    <Header/>
     <div className="page2">
       <Image
         src={image1}
@@ -55,6 +54,7 @@ function page2() {
       </div>
 
     </div>
+    </>
   );
 }
 
