@@ -1,7 +1,9 @@
 "use client";
 import React, { useEffect, useState, useCallback } from 'react';
+
 import Image from 'next/image';
 import { Grid } from 'lucide-react';
+var Aromanize = require("aromanize");
 
 interface ImageData {
     file_name: string;
@@ -39,7 +41,8 @@ const ImageGallery: React.FC = () => {
         try {
             const response = await fetch(`/api/get-search-image?input=${encodeURIComponent(userInput)}`, { method: 'GET' })
             const data = await response.json()
-            setResult(data.results || [])
+            setResult([...result, data.results[1]] || [])
+
         } catch (error) {
             console.log(error);
 
@@ -48,7 +51,8 @@ const ImageGallery: React.FC = () => {
     }
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            setInputValue(e.target.value);
+            const newInput = e.target.value;
+            setInputValue(Aromanize.romanize(newInput));
         },
         []);
 
@@ -65,7 +69,7 @@ const ImageGallery: React.FC = () => {
     return (
         <>
             <input type="text" onChange={handleChange} onKeyDown={handleComplete}
-                value={inputValue} className="border-b" />
+                className="border-b" />
             {result?.length === 0 ? (
                 <div>No result found</div>
             ) : (

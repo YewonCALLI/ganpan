@@ -14,6 +14,7 @@
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "^2.45.3",
+    "aromanize": "^0.1.5",
     "autoprefixer": "10.4.17",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -24,11 +25,8 @@
     "prettier": "^3.3.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-<<<<<<< HEAD
-    "react-router-dom": "^6.26.2"
-=======
+    "react-router-dom": "^6.26.2",
     "tus-js-client": "^4.2.3"
->>>>>>> 42c8b8b48e7a2a53d3ea050dcb8fac8c643619d8
   },
   "devDependencies": {
     "@types/node": "20.10.6",
