@@ -1,50 +1,76 @@
-"use client";
-
+'use client';
 import dynamic from 'next/dynamic';
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Notes from './main/page';
-import './app.css';
-import Page1 from '@/app/page1';
-import Page2 from '@/app/page2';
-import About from '@/app/about';
-import localFont from 'next/font/local'
+import { useRouter } from 'next/navigation';
+import '../app/app.css';
+import Image from 'next/image';
+import image1 from '@/background.png';
+import pencil from '@/Group 6.svg';
 import Header from '@/components/Header';
+import localFont from 'next/font/local';
+import completeicon from '@/Group 5 1.svg';
 
-const pretendard = localFont({
-  src: '../public/fonts/PretendardVariable.woff2',
-  display: 'swap',
-  weight: '45 920'
-})
 
-const page = () => {
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={
-                    <div className={pretendard.className}>
-                    <Page1 />
-                    <Header />
-                    </div>
-                } />
-                <Route path="/page2" element={
-                    <div className={pretendard.className}>
-                    <Page2 />
-                    <Header />
-                    </div>
-                } />
-                <Route path='/about' element={
-                    <div className={pretendard.className}>
-                    <About />
-                    <Header />
-                    </div>
-                } />
-            </Routes>
-        </Router>
-        
-    );
-};
+function page1() {
 
-export default page;
+  const router = useRouter();
+ 
 
+  return (
+    <>
+    <Header/>
+    <div className="page1">
+      <div className='title' style={{ fontFamily: 'CustomFont' }}>
+        <p>문구를 작성하세요</p>
+      </div>
+      <div className="pencil">
+        {/* 연필 이미지 아이콘 추가 */}
+        {[...Array(1)].map((_, index) => (
+          <Image 
+          key={index} 
+          src={pencil} 
+          alt="pencil icon" 
+          quality={75}
+          />
+        ))}
+      </div>
+      <div className='pencil2'>
+      {[...Array(1)].map((_, index) => (
+          <Image 
+          key={index} 
+          src={pencil} 
+          alt="pencil icon" 
+          quality={75}
+          style={{top: '500px'}}
+          />
+        ))}
+      </div>
+      <div className='complete_icon'>
+        <Image 
+        src={completeicon} 
+        alt="pencil icon" 
+        quality={75} 
+        onClick = {() => {
+          router.push('/page2');
+        }}
+        style={{cursor: 'pointer'}}
+        />
+      </div>
+      <div className='text-type1' style={{fontWeight:'300', color: '#292929'}}>
+        <p>
+          최대 15자까지 가능해요.
+        </p>
+      </div>
+      <Image
+        src={image1}
+        alt="cat"
+        quality={75}
+        style={{width: '100%', height: '100%'}}
+      />
+    </div>
+    </>
+  );
+}
+
+export default page1;

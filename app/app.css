@@ -5,6 +5,14 @@
     font-style: normal;
   }
   
+  .webgl
+  {
+      position: relative;
+      top: 0;
+      left: 0;
+      outline: none;
+  }
+  
 .title{
     font-family: 'CustomFont';
     font-size: 3em;

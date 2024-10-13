@@ -3,20 +3,15 @@
 import dynamic from 'next/dynamic';
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import '../app/app.css';
 import Image from 'next/image';
 import bell_icon from '@/bell_icon.png';
 
-function header(){
-    const navigate = useNavigate();
-
-    const handleImageClick = () => {
-        navigate('/about');
-    };
+function Header(){
+    const navigate = useRouter();
     return (
-        <div className="header" onClick={handleImageClick}>
+        <div className="header" onClick={() => {navigate.push('/about');}} style={ {zIndex: 1000, position: 'absolute'} }>
             <Image
                 src={bell_icon}
                 alt="bell icon"
@@ -29,4 +24,4 @@ function header(){
     );
 }
 
-export default header;
+export default Header;
