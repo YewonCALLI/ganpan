@@ -10,6 +10,7 @@ import pencil from '@/Group 6.svg';
 import Header from '@/components/Header';
 import localFont from 'next/font/local';
 import completeicon from '@/Group 12.png';
+import reloadicon from '@/reload.png';
 
 
 function page1() {
@@ -41,22 +42,32 @@ function page1() {
                 />
               ))}
             </div>
-            <div className='pencil2'>
-            {[...Array(1)].map((_, index) => (
+            <div className='container2'>
+              <div className='reload-icon'>
                 <Image 
-                key={index} 
-                src={pencil} 
-                alt="pencil icon" 
+                src={reloadicon} 
+                alt="reload icon" 
                 quality={75}
-                style={{top: '500px'}}
+                style={{cursor: 'pointer'}}
                 />
-              ))}
+              </div>
+              <div className='pencil2'>
+              {[...Array(1)].map((_, index) => (
+                  <Image 
+                  key={index} 
+                  src={pencil} 
+                  alt="pencil icon" 
+                  quality={75}
+                  style={{top: '500px'}}
+                  />
+                ))}
+              </div>
             </div>
           </div>
           <div className='complete_icon'>
             <Image 
             src={completeicon} 
-            alt="pencil icon" 
+            alt = "complete icon"
             quality={75} 
             onClick = {() => {
               router.push('/page2');
@@ -64,6 +75,7 @@ function page1() {
             style={{cursor: 'pointer'}}
             />
           </div>
+
           <div className='text-type1' style={{fontWeight:'300', color: '#292929'}}>
             <p>
               최대 15자까지 가능해요.
