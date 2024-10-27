@@ -1,12 +1,12 @@
 import { createClient } from '@/utils/supabase/server';
 import ImageUploadButton from '../../components/uploadButton';
-import ImageGallery from '../../components/ImageGallery';
+import ImageSearch from '@/components/ImageSearch';
 
 export default async function Main() {
 
 
     return (<>
         {/* <ImageUploadButton /> */}
-        <ImageGallery />
+        <ImageSearch />
     </>)
 }
