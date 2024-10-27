@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 import Image from 'next/image';
 import { Grid, LogIn } from 'lucide-react';
 import { log } from 'console';
 import heic2any from 'heic2any';
-
+import html2canvas from 'html2canvas';
 var Aromanize = require("aromanize");
 
 interface ImageData {
@@ -20,6 +20,7 @@ const ImageSearch: React.FC = () => {
     const [inputValue, setInputValue] = useState('');
     const [enterPositions, setEnterPositions] = useState<Number[]>([])
     const [averageWidth, setAverageWidth] = useState<Number>(0);
+    const containerRef = useRef<(HTMLDivElement | null)[]>([]);
 
 
     const fetchParentImages = async (userInput: number) => {
@@ -186,7 +187,37 @@ const ImageSearch: React.FC = () => {
         return rows;
     };
 
+    const saveAllRowsAsOneImage = async () => {
+        try {
+            const container = containerRef.current;
+            if (!container) return;
 
+            // DOM을 canvas로 변환
+            const canvas = await html2canvas(container, {
+                useCORS: true,
+                scale: 2,
+                logging: false,
+                allowTaint: true,
+            });
+            // Canvas를 blob으로 직접 변환
+            canvas.toBlob(async (blob) => {
+                if (!blob) return;
+
+                const formData = new FormData();
+                formData.append('file', blob, `capture-${Date.now()}.png`);
+
+                const response = await fetch('/api/upload-generated-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                console.log('Upload result:', result);
+            }, 'image/png', 1.0);
+        } catch (error) {
+            console.error('Error saving image:', error);
+        }
+    };
 
     return (
         <div className="container mx-auto p-4">
@@ -201,35 +232,43 @@ const ImageSearch: React.FC = () => {
                 />
             </div>
             <div className='flex flex-col'>
-                {groupImagesByRow(result).map((row, rowIndex) => (
-                    <div
-                        key={rowIndex}
-                        className='flex'
-                        style={{
-                            width: `${averageWidth * 300}px`,
-                            marginBottom: '1px' // 줄 간격
-                        }}
-                    >
-                        {row.map((image, imageIndex) => (
-                            <div
-                                key={imageIndex}
-                                className="h-80 relative overflow-hidden flex items-center justify-center group border border-gray-100"
-                                style={{
-                                    width: `${100 / row.length}%`, // 각 이미지가 동일한 너비를 가지도록
-                                    flexGrow: 1
-                                }}
-                                onClick={() => handleParentClick(image.fk_parent_id)}
-                            >
-                                <img
-                                    src={image.public_url}
-                                    alt={image.file_name}
-                                    className="h-full w-full object-fit"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                ))}
-            </div>
+                <div style={{
+                    width: `${averageWidth * 300}px`
+                }} ref={containerRef}>
+                    {groupImagesByRow(result).map((row, rowIndex) => (
+                        <div
+                            key={rowIndex}
+                            className='flex'
+                            style={{
+                                width: `${averageWidth * 300}px`,
+                                marginBottom: '1px' // 줄 간격
+                            }}
+                        >
+                            {row.map((image, imageIndex) => (
+                                <div
+                                    key={imageIndex}
+                                    className="h-80 relative overflow-hidden flex items-center justify-center group "
+                                    style={{
+                                        width: `${100 / row.length}%`, // 각 이미지가 동일한 너비를 가지도록
+                                        flexGrow: 1
+                                    }}
+                                    onClick={() => handleParentClick(image.fk_parent_id)}
+                                >
+                                    <img
+                                        src={image.public_url}
+                                        alt={image.file_name}
+                                        className="h-full w-full object-fit"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    ))}</div>
+            </div>   <button
+                onClick={() => saveAllRowsAsOneImage()}
+                className="absolute right-0 top-0 bg-blue-500 text-white px-2 py-1 rounded"
+            >
+                Save as Image
+            </button>
         </div >
     );
 };
