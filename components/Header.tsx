@@ -17,7 +17,7 @@ function Header(){
                 alt="bell icon"
                 quality={75}
             />
-            <div style={{fontWeight:'800', fontSize:'1.3rem', color: '#292929'}}> 
+            <div style={{fontWeight:'800', fontSize:'2em', color: '#292929', fontFamily:'dongle'}}> 
                 프로젝트 소개
             </div>
         </div>
