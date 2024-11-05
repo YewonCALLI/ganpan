@@ -28,6 +28,8 @@
 }
 
 
+
+
 .header{
     position: fixed;
     display: flex;
@@ -69,7 +71,7 @@
     justify-content: space-between;
     align-items: center;
     top: 0%;
-    height: 60%;
+    width: 100%;
 }
 .pencil{
     position: relative;
@@ -133,7 +135,6 @@
 
 .page2-buttons :hover{
     opacity: 0.85;
-    animation: rotate 1s linear infinite;
 }
 
 .subtitle{
@@ -143,7 +144,42 @@
     font-size: 2.5em;
     color: #4c00ff;
 }
+.top-container{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
 
+.additional-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 10px;
+    width: 70%;
+}
+.font1{
+    font-family: "Gothic A1", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.0em;
+    padding: 10px;
+    border-bottom: solid 2px #00d5ff;
+    border-right: solid 2px #00d5ff;
+    width: 100%;
+    text-align: left;
+}
+.font1-1{
+    font-family: "Gothic A1", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.0em;
+    padding: 10px;
+    border-bottom: solid 2px #00d5ff;
+    border-right: solid 2px #00d5ff;
+    text-align: center;
+    width: fit-content;
+    white-space: nowrap;
+}
 .content{
     font-family: "Gothic A1", sans-serif;
     font-weight: 400;
@@ -156,6 +192,29 @@
 .content a {
     text-decoration:underline;
     color: blue;
+}
+
+.Rectangle-21 {
+    width: 90%;
+    margin: 17px;
+    border: solid 2px #00d5ff;
+    background-color: #fff;
+}
+.top-container input{
+    width: 70%;
+    font-size: 2em;
+    outline: none;
+}
+
+.top-container Image{
+    width: 100%;
+}
+
+.error-message{
+    font-family: "Gothic A1", sans-serif;
+    font-weight: 400;
+    color:red;
+    font-size: 1.1em;
 }
 
 @keyframes rotate {

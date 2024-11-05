@@ -22,14 +22,14 @@ function Page2() {
           src={image1}
           alt="background"
           quality={75}
-          style={{ position:'absolute', width: '100%', height: '100%' }}
+          style={{ position: 'absolute', width: '100%', height: '100%' }}
         />
         <div className='container'>
           <div className="title">
             <p>글자를 클릭하여 출처를 확인해 보세요.</p>
           </div>
           <div className="result">
-            <div id="generated-image" style={{width:'fit-content'}}>
+            <div id="generated-image" style={{ width: 'fit-content' }}>
               <Image
                 src={storeImage}
                 alt="store"
