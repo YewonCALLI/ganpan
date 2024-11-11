@@ -185,6 +185,8 @@ function Page1() {
             alt="complete"
             quality={75}
             onClick={() => {
+              sessionStorage.setItem('ganpanResult', JSON.stringify(ganpanResult));
+              sessionStorage.setItem('averageWidth', JSON.stringify(averageWidth));
               router.push('/page2');
             }}
             style={{ cursor: 'pointer' }}

@@ -41,17 +41,23 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
     const handleParentClick = async (id: number) => {
         await fetchParentImages(Number(id));
     }
+    const calculateWidth = () => {
+        const caculatedWidth = averageWidth * 300;
+        return Math.min(caculatedWidth, 652);
+    }
+    const width = calculateWidth();
     return (
         <div className='flex flex-col'>
             <div style={{
-                width: `${averageWidth * 300}px`
+                width: `${width}px`,
+                maxWidth: '652px'
             }} ref={containerRef}>
                 {groupImagesByRow(images).map((row, rowIndex) => (
                     <div
                         key={rowIndex}
                         className='flex'
                         style={{
-                            width: `${averageWidth * 300}px`,
+                            width: '100%',
                             marginBottom: '1px' // 줄 간격
                         }}
                     >
