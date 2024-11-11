@@ -22,17 +22,14 @@ function Page1() {
   const [enterPositions, setEnterPositions] = useState<Number[]>([])
   const [averageWidth, setAverageWidth] = useState<Number>(0);
   const [inputValue, setInputValue] = useState('');
+  const [processedInputs, setProcessedInputs] = useState<string[]>([]);  // 저장할 processedInputs 추가
 
   const router = useRouter();
   const InputRef = useRef();
 
   const handleAverageWidth = (average: Number) => {
-    setAverageWidth(average)
-  }
-  const handleResetButton = () => {
-    InputRef.current.handleReset();
-  }
-
+    setAverageWidth(average);
+  };
 
   const fetchSearchedImages = async (userInput: string) => {
     try {
@@ -46,65 +43,101 @@ function Page1() {
     }
   };
 
-  const handleInputText = (
-    (newInput: string) => {
+  const handleInputText = (input: string) => {
+    console.log('Processing input:', input);
 
-      let processedList: string[] = [];
-      let newEnterPositions: number[] = [];
-      let currentWordLength = 0;
-      let wordLengths: number[] = [];
+    const words = input.split(' ');
+    let processedList: string[] = [];
+    let newEnterPositions: number[] = [];
+    let currentPosition = 0;
+    let wordLengths: number[] = [];
 
-      newInput.split("").forEach((input, index) => {
-        if (input === ' ') {
-          newEnterPositions.push(index);
-          // 현재 단어의 길이를 배열에 저장
-          wordLengths.push(currentWordLength);
-          // 단어 길이 리셋
-          currentWordLength = 0;
-        } else {
-          currentWordLength++;
+    words.forEach((word, wordIndex) => {
+      if (word.length > 0) {
+        wordLengths.push(word.length);
 
-          if (/[a-zA-Z]/.test(input)) {
-            processedList.push(input.toUpperCase());
-          } else if (input === "닭") {
+        word.split('').forEach((char) => {
+          if (/[a-zA-Z]/.test(char)) {
+            processedList.push(char.toUpperCase());
+          } else if (char === "닭") {
             processedList.push("dalg");
           } else {
-            processedList.push(Aromanize.romanize(input));
+            processedList.push(Aromanize.romanize(char));
           }
+        });
+
+        if (wordIndex < words.length - 1 && words[wordIndex + 1].length > 0) {
+          newEnterPositions.push(processedList.length);
         }
-        // 마지막 단어의 길이도 추가
-        if (currentWordLength > 0) {
-          wordLengths.push(currentWordLength);
-        }
-      });
+      }
+    });
 
+    const newAverage = wordLengths.length > 0
+      ? wordLengths.reduce((sum, length) => sum + length, 0) / wordLengths.length
+      : 0;
 
-      // 모든 단어 길이의 평균 계산
-      const newAverage = wordLengths.length > 0
-        ? wordLengths.reduce((sum, length) => sum + length, 0) / wordLengths.length
-        : 0;
+    console.log('Processed list:', processedList);
+    console.log('Enter positions:', newEnterPositions);
+    console.log('Average width:', newAverage);
 
-      setAverageWidth(newAverage);
-      setEnterPositions(prevPositions => [...prevPositions, ...newEnterPositions]);
+    // 상태 업데이트
+    setAverageWidth(newAverage);
+    setEnterPositions(newEnterPositions);
+    setProcessedInputs(processedList); // processedList 상태 저장
 
-      return processedList;
-    }
-  );
+    return processedList;
+  };
+
   const handleGenerateButton = async (e: React.MouseEvent) => {
+    if (!inputValue) return; // inputValue가 없으면 아무것도 하지 않음
+
+    // 입력값 처리 후 processedInputs와 enterPositions 상태에 기반하여 이미지를 생성
     const processedInputs = handleInputText(inputValue);
+
+    // 이미지 가져오기
     const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
-    // 각 위치에 빈 ImageData 객체 삽입
-    enterPositions.forEach(position => {
-      allResults.splice(Number(position), 0, {
+
+    // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
+    const positions = [...enterPositions].sort((a: any, b: any) => a - b); // 오름차순 정렬
+    positions.forEach((position, index) => {
+      allResults.splice(Number(position) + index, 0, {
         file_name: '',
         public_url: ''
       });
     });
-    await setGanpanResult(allResults)
+
+    setGanpanResult(allResults);
+    console.log('Final ganpanResult:', allResults);
   };
+
   const handleInputChange = (input) => {
     setInputValue(input);
-  }
+  };
+
+  // useEffect를 통해 상태 변경 후 처리할 작업
+  useEffect(() => {
+    // enterPositions와 averageWidth가 업데이트되었을 때만 이미지 결과를 생성
+    if (enterPositions.length > 0 && averageWidth > 0) {
+      const generateResults = async () => {
+        const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
+
+        // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
+        const positions = [...enterPositions].sort((a: any, b: any) => a - b);
+        positions.forEach((position, index) => {
+          allResults.splice(Number(position) + index, 0, {
+            file_name: '',
+            public_url: ''
+          });
+        });
+
+        setGanpanResult(allResults);
+        console.log('Final ganpanResult from useEffect:', allResults);
+      };
+
+      generateResults();
+    }
+  }, [enterPositions, averageWidth, processedInputs]);  // processedInputs가 변경될 때만 실행
+
   return (
     <>
       <Header />
@@ -131,7 +164,7 @@ function Page1() {
                 </div>
                 <div className="font1">
                 </div>
-                <div className="font1-1" onClick={handleResetButton}>
+                <div className="font1-1" onClick={handleGenerateButton}>
                   <button>다시 ♽️</button>
                 </div>
               </div>
@@ -141,8 +174,6 @@ function Page1() {
                 </div>
 
                 <GanpanImage images={ganpanResult} averageWidth={averageWidth} />
-                {/* <Input onGanpanImage={handleGanpanImage} onAverageWidth={handleAverageWidth} />
-                <GanpanImage images={result} averageWidth={averageWidth} ></GanpanImage> */}
               </div>
             </div>
           </div>
