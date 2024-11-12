@@ -132,7 +132,7 @@ function Page1() {
     setGanpanResult([]); // 결과 초기화
 
     // enterPositions와 averageWidth가 업데이트되었을 때만 이미지 결과를 생성
-    if (enterPositions.length > 0 && averageWidth > 0) {
+    if (enterPositions.length > 0 && Number(averageWidth) > 0) {
       const generateResults = async () => {
 
         // 이미지 가져오기
