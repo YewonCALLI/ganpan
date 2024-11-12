@@ -197,9 +197,9 @@ function Page1() {
                 <div className='additional-container'>
                   <Input ref={InputRef} onInputChange={handleInputChange} />
                 </div>
-
-                <GanpanImage images={ganpanResult} averageWidth={averageWidth} /></div>
-
+                <div className='w-[50%]'>
+                  <GanpanImage images={ganpanResult} averageWidth={averageWidth} /></div>
+              </div>
             </div>
           </div>
         </div>

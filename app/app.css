@@ -58,6 +58,7 @@
   position: relative;
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 .input-container {
   position: relative;
@@ -98,12 +99,11 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  top: 0%;
-  width: 80%;
+  padding: 2vh 0;
   height: 100%;
+  width: 80%;
 }
 
 .container2 {
@@ -117,7 +117,7 @@
 .result {
   /* position: relative; */
   display: flex;
-  height: 80%;
+  height: 60vh;
   flex-direction: row;
   gap: 20px;
 }
@@ -223,4 +223,11 @@
     -o-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+/* GanpanImage 컴포넌트의 컨테이너 스타일 수정 */
+#generated-image {
+  height: 100% !important; /* !important로 다른 스타일 덮어쓰기 */
+  display: flex;
+  align-items: center;
 }

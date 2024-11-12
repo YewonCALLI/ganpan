@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import heic2any from 'heic2any';
 import { Gothic_A1 } from 'next/font/google'
+import { Loader2 } from "lucide-react"; // lucide-react의 로딩 아이콘 사용
 
 const gothicA1 = Gothic_A1({
     weight: ['400', '700'], // 필요한 weight 추가
@@ -16,6 +17,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
     const [tmpParentImage, setTmpParentImage] = useState<string>();
     const [parentImage, setParentImage] = useState<string>();
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
 
 
     const groupImagesByRow = (images: ImageData[]) => {
@@ -49,14 +51,20 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
 
     // 클릭 시 original photo를 렌더링하는 부분
     useEffect(() => {
-        if (tmpParentImage?.toLowerCase().endsWith('.heic')) {
-            convertHEICToJPEG(tmpParentImage).then(newUrl => {
+        const convertImage = async () => {
+            if (!tmpParentImage) return;
+
+            setIsLoading(true); // HEIC 변환 시작할 때도 로딩 표시
+            if (tmpParentImage?.toLowerCase().endsWith('.heic')) {
+                const newUrl = await convertHEICToJPEG(tmpParentImage);
                 setParentImage(newUrl);
-            });
-        }
-        else {
-            setParentImage(tmpParentImage);
-        }
+            } else {
+                setParentImage(tmpParentImage);
+            }
+            setIsLoading(false); // 변환 완료 후 로딩 해제
+        };
+
+        convertImage();
     }, [tmpParentImage])
 
     const fetchParentImages = async (userInput: number) => {
@@ -67,7 +75,11 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
         } catch (error) {
             setTmpParentImage('')
         }
+        finally {
+            setIsLoading(false)
+        }
     }
+
     const handleParentClick = async (id: number) => {
         setSelectedImageId(id);
         await fetchParentImages(Number(id));
@@ -96,7 +108,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
 
 
     return (
-        <div className='flex'>
+        <div className='flex gap-3'>
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -120,7 +132,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                                     return (
                                         <div
                                             key={imageIndex}
-                                            className="h-80 relative overflow-hidden flex items-center justify-center"
+                                            className="h-52 relative overflow-hidden flex items-center justify-center"
                                             style={{
                                                 width: `${100 / row.length}%`,
                                                 flexGrow: 1,
@@ -136,7 +148,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                                 return (
                                     <div
                                         key={imageIndex}
-                                        className="h-80 relative overflow-hidden flex items-center justify-center group cursor-pointer"
+                                        className="h-52 relative overflow-hidden flex items-center justify-center group cursor-pointer"
                                         style={{
                                             width: `${100 / row.length}%`,
                                             flexGrow: 1,
@@ -156,16 +168,23 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                         </div>
                     ))}</div>
             </div>
-            <div className="w-[652px] h-[500px] flex items-center justify-center">
-                {parentImage && (
+            <div className="w-[752px] h-[600px] flex items-center justify-center">
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center">
+                        <Loader2 className="w-12 h-12 animate-spin text-[#00D5FF]" />
+                        <span className={`mt-2 text-[#00D5FF] ${gothicA1.className}`}>
+                            이미지를 불러오는 중...
+                        </span>
+                    </div>
+                ) : parentImage ? (
                     <img
                         className='max-w-full max-h-full object-contain border-[10px] border-[#00D5FF]'
                         src={parentImage}
                         alt="부모이미지"
                     />
-                )}
+                ) : null}
             </div>
-        </div >
+        </div>
     );
 };
 

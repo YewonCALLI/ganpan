@@ -126,7 +126,7 @@ function Page2() {
             <p>글자를 클릭하여 출처를 확인해 보세요.</p>
           </div>
           <div className="result">
-            <div ref={containerRef} id="generated-image" className='h-full object-contain	 flex items-center'>
+            <div ref={containerRef} id="generated-image" className='h-[full] flex items-center'>
               {ganpanResult && <GanpanImage images={ganpanResult} averageWidth={averageWidth} />}
             </div>
           </div>
