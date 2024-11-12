@@ -123,7 +123,7 @@ function Page1() {
     setGanpanResult(refinedResults);
   };
 
-  const handleInputChange = (input) => {
+  const handleInputChange = (input : any) => {
     setInputValue(input);
   };
 
