@@ -1,5 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import heic2any from 'heic2any';
+import { Gothic_A1 } from 'next/font/google'
+
+const gothicA1 = Gothic_A1({
+    weight: ['400', '700'], // 필요한 weight 추가
+    subsets: ['latin'],
+    display: 'swap',
+});
 interface GanpanImageProps {
     images: ImageData[];
     averageWidth: number;
@@ -18,10 +25,16 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
         images.forEach((image) => {
             if (image?.public_url) {
                 currentRow.push(image);
+
             } else {
-                if (currentRow.length > 0) {
-                    rows.push(currentRow);
-                    currentRow = [];
+                if (image?.file_name) {
+                    currentRow.push(image?.file_name);
+                }
+                else {
+                    if (currentRow.length > 0) {
+                        rows.push(currentRow);
+                        currentRow = [];
+                    }
                 }
             }
         });
@@ -82,22 +95,14 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
     }
 
 
-    const calculateWidth = () => {
-        const caculatedWidth = averageWidth * 300;
-        return Math.min(caculatedWidth, 652);
-    }
-    const width = calculateWidth();
-
     return (
-        <div className='flex items-start'>
+        <div className='flex'>
             <div style={{
-                width: '652px',
-                height: '500px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
             }} ref={containerRef}><div style={{
-                width: `${width}px`,
+                width: `${averageWidth * 500}px`,
                 maxWidth: '652px',
             }}>
                     {groupImagesByRow(images).map((row, rowIndex) => (
@@ -109,25 +114,45 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                                 marginBottom: '1px' // 줄 간격
                             }}
                         >
-                            {row.map((image, imageIndex) => (
-                                <div
-                                    key={imageIndex}
-                                    className="h-80 relative overflow-hidden flex items-center justify-center group cursor-pointer"
-                                    style={{
-                                        width: `${100 / row.length}%`,
-                                        flexGrow: 1,
-                                        border: selectedImageId === image.fk_parent_id ? '10px solid #00D5FF' : 'none',
-                                        transition: 'border 0.3s ease'
-                                    }}
-                                    onClick={() => handleParentClick(image.fk_parent_id)}
-                                >
-                                    <img
-                                        src={image.public_url}
-                                        alt={image.file_name}
-                                        className="h-full w-full object-fit"
-                                    />
-                                </div>
-                            ))}
+                            {row.map((image, imageIndex) => {
+                                // image가 string인 경우 텍스트로 표시
+                                if (typeof image === 'string') {
+                                    return (
+                                        <div
+                                            key={imageIndex}
+                                            className="h-80 relative overflow-hidden flex items-center justify-center"
+                                            style={{
+                                                width: `${100 / row.length}%`,
+                                                flexGrow: 1,
+                                                backgroundColor: '#f0f0f0'  // 텍스트 배경색 지정
+                                            }}
+                                        >
+                                            <span className={`text-lg text-center p-4 text-9xl ${gothicA1.className}`}>{image}</span>
+                                        </div>
+                                    );
+                                }
+
+                                // 이미지인 경우 기존 렌더링
+                                return (
+                                    <div
+                                        key={imageIndex}
+                                        className="h-80 relative overflow-hidden flex items-center justify-center group cursor-pointer"
+                                        style={{
+                                            width: `${100 / row.length}%`,
+                                            flexGrow: 1,
+                                            border: selectedImageId === image.fk_parent_id ? '10px solid #00D5FF' : 'none',
+                                            transition: 'border 0.3s ease'
+                                        }}
+                                        onClick={() => handleParentClick(image.fk_parent_id)}
+                                    >
+                                        <img
+                                            src={image.public_url}
+                                            alt={image.file_name}
+                                            className="h-full w-full object-fit"
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     ))}</div>
             </div>
@@ -140,7 +165,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                     />
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 

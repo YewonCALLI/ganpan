@@ -21,6 +21,7 @@ function Page1() {
   const [ganpanResult, setGanpanResult] = useState<ImageData[] | []>([])
   const [enterPositions, setEnterPositions] = useState<Number[]>([])
   const [averageWidth, setAverageWidth] = useState<Number>(0);
+  const [hanguelInput, setHanguelInput] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [processedInputs, setProcessedInputs] = useState<string[]>([]);  // 저장할 processedInputs 추가
 
@@ -34,9 +35,11 @@ function Page1() {
   const fetchSearchedImages = async (userInput: string) => {
     try {
       const response = await fetch(`/api/get-search-image?input=${encodeURIComponent(userInput)}`, { method: 'GET' });
+
       const data = await response.json();
       const randomIndex = Math.floor(Math.random() * data.results.length);
       return data.results[randomIndex];
+
     } catch (error) {
       console.log(error);
       return [];
@@ -44,10 +47,10 @@ function Page1() {
   };
 
   const handleInputText = (input: string) => {
-    console.log('Processing input:', input);
 
     const words = input.split(' ');
     let processedList: string[] = [];
+    let hanguelList: string[] = [];
     let newEnterPositions: number[] = [];
     let currentPosition = 0;
     let wordLengths: number[] = [];
@@ -59,10 +62,13 @@ function Page1() {
         word.split('').forEach((char) => {
           if (/[a-zA-Z]/.test(char)) {
             processedList.push(char.toUpperCase());
+            hanguelList.push(char);
           } else if (char === "닭") {
             processedList.push("dalg");
+            hanguelList.push('닭');
           } else {
             processedList.push(Aromanize.romanize(char));
+            hanguelList.push(char);
           }
         });
 
@@ -76,20 +82,18 @@ function Page1() {
       ? wordLengths.reduce((sum, length) => sum + length, 0) / wordLengths.length
       : 0;
 
-    console.log('Processed list:', processedList);
-    console.log('Enter positions:', newEnterPositions);
-    console.log('Average width:', newAverage);
 
     // 상태 업데이트
     setAverageWidth(newAverage);
     setEnterPositions(newEnterPositions);
     setProcessedInputs(processedList); // processedList 상태 저장
-
+    setHanguelInput(hanguelList)
     return processedList;
   };
 
   const handleGenerateButton = async (e: React.MouseEvent) => {
     if (!inputValue) return; // inputValue가 없으면 아무것도 하지 않음
+    setGanpanResult([]); // 결과 초기화
 
     // 입력값 처리 후 processedInputs와 enterPositions 상태에 기반하여 이미지를 생성
     const processedInputs = handleInputText(inputValue);
@@ -97,17 +101,26 @@ function Page1() {
     // 이미지 가져오기
     const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
 
+    // undefined인 결과를 원래 입력값으로 대체
+    const refinedResults = allResults.map((result, index) => {
+      if (result === undefined) {
+        return {
+          file_name: hanguelInput[index],
+          public_url: ''
+        };
+      }
+      return result;
+    });
     // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
     const positions = [...enterPositions].sort((a: any, b: any) => a - b); // 오름차순 정렬
     positions.forEach((position, index) => {
-      allResults.splice(Number(position) + index, 0, {
+      refinedResults.splice(Number(position) + index, 0, {
         file_name: '',
         public_url: ''
       });
     });
 
-    setGanpanResult(allResults);
-    console.log('Final ganpanResult:', allResults);
+    setGanpanResult(refinedResults);
   };
 
   const handleInputChange = (input) => {
@@ -116,27 +129,39 @@ function Page1() {
 
   // useEffect를 통해 상태 변경 후 처리할 작업
   useEffect(() => {
+    setGanpanResult([]); // 결과 초기화
+
     // enterPositions와 averageWidth가 업데이트되었을 때만 이미지 결과를 생성
     if (enterPositions.length > 0 && averageWidth > 0) {
       const generateResults = async () => {
-        const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
 
+        // 이미지 가져오기
+        const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
+        // undefined인 결과를 원래 입력값으로 대체
+        const refinedResults = allResults.map((result, index) => {
+          if (result === undefined) {
+            return {
+              file_name: hanguelInput[index],
+              public_url: ''
+            };
+          }
+          return result;
+        });
         // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
-        const positions = [...enterPositions].sort((a: any, b: any) => a - b);
+        const positions = [...enterPositions].sort((a: any, b: any) => a - b); // 오름차순 정렬
         positions.forEach((position, index) => {
-          allResults.splice(Number(position) + index, 0, {
+          refinedResults.splice(Number(position) + index, 0, {
             file_name: '',
             public_url: ''
           });
         });
 
-        setGanpanResult(allResults);
-        console.log('Final ganpanResult from useEffect:', allResults);
+        setGanpanResult(refinedResults);
       };
 
       generateResults();
     }
-  }, [enterPositions, averageWidth, processedInputs]);  // processedInputs가 변경될 때만 실행
+  }, [enterPositions, averageWidth, processedInputs, hanguelInput]);  // processedInputs가 변경될 때만 실행
 
   return (
     <>
@@ -173,8 +198,8 @@ function Page1() {
                   <Input ref={InputRef} onInputChange={handleInputChange} />
                 </div>
 
-                <GanpanImage images={ganpanResult} averageWidth={averageWidth} />
-              </div>
+                <GanpanImage images={ganpanResult} averageWidth={averageWidth} /></div>
+
             </div>
           </div>
         </div>
