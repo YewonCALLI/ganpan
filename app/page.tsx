@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
-
-import React, { useState } from 'react';
+var Aromanize = require("aromanize");
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import '../app/app.css';
 import Image from 'next/image';
@@ -18,28 +18,150 @@ import GanpanImage from '@/components/GanpanImage';
 
 function Page1() {
   const [result, setResult] = useState([]);
-  const [inputText, setInputText] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [ganpanResult, setGanpanResult] = useState<ImageData[] | []>([])
+  const [enterPositions, setEnterPositions] = useState<Number[]>([])
+  const [averageWidth, setAverageWidth] = useState<Number>(0);
+  const [hanguelInput, setHanguelInput] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [processedInputs, setProcessedInputs] = useState<string[]>([]);  // 저장할 processedInputs 추가
+
   const router = useRouter();
+  const InputRef = useRef();
 
-  const maxChars = 15; 
+  const handleAverageWidth = (average: Number) => {
+    setAverageWidth(average);
+  };
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
+  const fetchSearchedImages = async (userInput: string) => {
+    try {
+      const response = await fetch(`/api/get-search-image?input=${encodeURIComponent(userInput)}`, { method: 'GET' });
 
-    if (value.length <= maxChars) {
-      setInputText(value);
-      setErrorMessage('');
-    } else {
-      setErrorMessage(`최대 ${maxChars}자까지만 입력할 수 있습니다.`);
+      const data = await response.json();
+      const randomIndex = Math.floor(Math.random() * data.results.length);
+      return data.results[randomIndex];
+
+    } catch (error) {
+      console.log(error);
+      return [];
     }
   };
 
-  const handleReset = () => {
-    setInputText('');
-    setResult([]);
-    setErrorMessage('');
+  const handleInputText = (input: string) => {
+
+    const words = input.split(' ');
+    let processedList: string[] = [];
+    let hanguelList: string[] = [];
+    let newEnterPositions: number[] = [];
+    let currentPosition = 0;
+    let wordLengths: number[] = [];
+
+    words.forEach((word, wordIndex) => {
+      if (word.length > 0) {
+        wordLengths.push(word.length);
+
+        word.split('').forEach((char) => {
+          if (/[a-zA-Z]/.test(char)) {
+            processedList.push(char.toUpperCase());
+            hanguelList.push(char);
+          } else if (char === "닭") {
+            processedList.push("dalg");
+            hanguelList.push('닭');
+          } else {
+            processedList.push(Aromanize.romanize(char));
+            hanguelList.push(char);
+          }
+        });
+
+        if (wordIndex < words.length - 1 && words[wordIndex + 1].length > 0) {
+          newEnterPositions.push(processedList.length);
+        }
+      }
+    });
+
+    const newAverage = wordLengths.length > 0
+      ? wordLengths.reduce((sum, length) => sum + length, 0) / wordLengths.length
+      : 0;
+
+
+    // 상태 업데이트
+    setAverageWidth(newAverage);
+    setEnterPositions(newEnterPositions);
+    setProcessedInputs(processedList); // processedList 상태 저장
+    setHanguelInput(hanguelList)
+    return processedList;
   };
+
+  const handleGenerateButton = async (e: React.MouseEvent) => {
+    if (!inputValue) return; // inputValue가 없으면 아무것도 하지 않음
+    setGanpanResult([]); // 결과 초기화
+
+    // 입력값 처리 후 processedInputs와 enterPositions 상태에 기반하여 이미지를 생성
+    const processedInputs = handleInputText(inputValue);
+
+    // 이미지 가져오기
+    const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
+
+    // undefined인 결과를 원래 입력값으로 대체
+    const refinedResults = allResults.map((result, index) => {
+      if (result === undefined) {
+        return {
+          file_name: hanguelInput[index],
+          public_url: ''
+        };
+      }
+      return result;
+    });
+    // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
+    const positions = [...enterPositions].sort((a: any, b: any) => a - b); // 오름차순 정렬
+    positions.forEach((position, index) => {
+      refinedResults.splice(Number(position) + index, 0, {
+        file_name: '',
+        public_url: ''
+      });
+    });
+
+    setGanpanResult(refinedResults);
+  };
+
+  const handleInputChange = (input) => {
+    setInputValue(input);
+  };
+
+  // useEffect를 통해 상태 변경 후 처리할 작업
+  useEffect(() => {
+    setGanpanResult([]); // 결과 초기화
+
+    // enterPositions와 averageWidth가 업데이트되었을 때만 이미지 결과를 생성
+    if (enterPositions.length > 0 && averageWidth > 0) {
+      const generateResults = async () => {
+
+        // 이미지 가져오기
+        const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
+        // undefined인 결과를 원래 입력값으로 대체
+        const refinedResults = allResults.map((result, index) => {
+          if (result === undefined) {
+            return {
+              file_name: hanguelInput[index],
+              public_url: ''
+            };
+          }
+          return result;
+        });
+        // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
+        const positions = [...enterPositions].sort((a: any, b: any) => a - b); // 오름차순 정렬
+        positions.forEach((position, index) => {
+          refinedResults.splice(Number(position) + index, 0, {
+            file_name: '',
+            public_url: ''
+          });
+        });
+
+        setGanpanResult(refinedResults);
+      };
+
+      generateResults();
+    }
+  }, [enterPositions, averageWidth, processedInputs, hanguelInput]);  // processedInputs가 변경될 때만 실행
 
   return (
     <>
@@ -60,37 +182,23 @@ function Page1() {
             <div className="input-area">
               <div className="top-container">
                 <div className="font1">
-                <p>최대 15자까지 가능해요.</p>
+                  <p>최대 15자까지 가능해요.</p>
                 </div>
-                <div className="font1-1">
+                <div className="font1-1" onClick={handleGenerateButton}>
                   <button>생성 ▶️</button>
                 </div>
                 <div className="font1">
                 </div>
-                <div className="font1-1">
+                <div className="font1-1" onClick={handleGenerateButton}>
                   <button>다시 ♽️</button>
                 </div>
               </div>
               <div className="top-container">
                 <div className='additional-container'>
-                <input
-                  type="text"
-                  value={inputText}
-                  placeholder='여기에 입력하세요'
-                  onChange={handleInputChange}
-                />
-                <div className="char-count">
-                  {inputText.length}/{maxChars}자
-                  {errorMessage && (
-                    <div className="error-message">{errorMessage}</div>
-                  )}
+                  <Input ref={InputRef} onInputChange={handleInputChange} />
                 </div>
-                </div>
-                <Image src={SampleImage}>
-                  {/* 이곳에 결과 이미지 */}
-                </Image>
-                {/* <Input onGanpanImage={handleGanpanImage} onAverageWidth={handleAverageWidth} />
-                <GanpanImage images={result} averageWidth={averageWidth} ></GanpanImage> */}
+                <div className='w-[50%]'>
+                  <GanpanImage images={ganpanResult} averageWidth={averageWidth} /></div>
               </div>
             </div>
           </div>
@@ -102,6 +210,8 @@ function Page1() {
             alt="complete"
             quality={75}
             onClick={() => {
+              sessionStorage.setItem('ganpanResult', JSON.stringify(ganpanResult));
+              sessionStorage.setItem('averageWidth', JSON.stringify(averageWidth));
               router.push('/page2');
             }}
             style={{ cursor: 'pointer' }}
