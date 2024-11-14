@@ -90,13 +90,15 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
             setTmpParentImage('')
         }
         finally {
-            setIsLoading(false)
+            // setIsLoading(false)
         }
     }
 
     const handleParentClick = async (id: number) => {
+        setIsLoading(true); // HEIC 변환 시작할 때도 로딩 표시
         setSelectedImageId(id);
         await fetchParentImages(Number(id));
+        // setIsLoading(false)
     }
 
     async function convertHEICToJPEG(url: string): Promise<string | null> {
