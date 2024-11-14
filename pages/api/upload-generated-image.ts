@@ -1,6 +1,6 @@
 // 서버 (pages/api/upload.ts)
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { IncomingForm } from 'formidable';
+import { IncomingForm,Fields, Files, File } from 'formidable';
 import supabase from '@/utils/supabase/supabaseClient';
 
 export const config = {
@@ -8,13 +8,21 @@ export const config = {
         bodyParser: false,
     },
 };
+interface FormidableFile extends File{
+    filepath:string;
+    orignalFilename:string;
+    newFilename:string;
+}
+interface ParsedFiles{
+    file:FormidableFile[];
+}
 
-const parseForm = (req: NextApiRequest) => {
+const parseForm = (req: NextApiRequest): Promise<ParsedFiles> => {
     return new Promise((resolve, reject) => {
         const form = new IncomingForm();
-        form.parse(req, (err, fields, files) => {
+        form.parse(req, (err, fields:Fields, files:Files) => {
             if (err) reject(err);
-            resolve(files);
+            resolve(files as unknown as ParsedFiles);
         });
     });
 };
@@ -30,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
 
          // 파일 데이터 읽기
-        const fileData = await new Promise((resolve, reject) => {
+        const fileData = await new Promise<Buffer>((resolve, reject) => {
             const chunks: Buffer[] = [];
             const stream = require('fs').createReadStream(file.filepath);
 

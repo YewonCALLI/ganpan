@@ -16,19 +16,27 @@ import Input from '@/components/Input';
 import SampleImage from '@/sample2.png';
 import GanpanImage from '@/components/GanpanImage';
 
+interface InputRef {
+  handleReset: () => void;
+}
+interface ImageData {
+  fk_parent_id?: number;
+  public_url: string;
+  file_name: string;
+}
 function Page1() {
   const [result, setResult] = useState([]);
-  const [ganpanResult, setGanpanResult] = useState<ImageData[] | []>([])
-  const [enterPositions, setEnterPositions] = useState<Number[]>([])
-  const [averageWidth, setAverageWidth] = useState<Number>(0);
+  const [ganpanResult, setGanpanResult] = useState<(ImageData | { file_name: string; })[]>([]);
+  const [enterPositions, setEnterPositions] = useState<number[]>([])
+  const [averageWidth, setAverageWidth] = useState<number>(0);
   const [hanguelInput, setHanguelInput] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [processedInputs, setProcessedInputs] = useState<string[]>([]);  // 저장할 processedInputs 추가
 
   const router = useRouter();
-  const InputRef = useRef();
+  const inputRef = useRef<InputRef>(null);
 
-  const handleAverageWidth = (average: Number) => {
+  const handleAverageWidth = (average: number) => {
     setAverageWidth(average);
   };
 
@@ -103,7 +111,7 @@ function Page1() {
 
     // undefined인 결과를 원래 입력값으로 대체
     const refinedResults = allResults.map((result, index) => {
-      if (result === undefined) {
+      if (!result) {
         return {
           file_name: hanguelInput[index],
           public_url: ''
@@ -123,7 +131,7 @@ function Page1() {
     setGanpanResult(refinedResults);
   };
 
-  const handleInputChange = (input : any) => {
+  const handleInputChange = (input: any) => {
     setInputValue(input);
   };
 
@@ -195,7 +203,7 @@ function Page1() {
               </div>
               <div className="top-container">
                 <div className='additional-container'>
-                  <Input ref={InputRef} onInputChange={handleInputChange} />
+                  <Input ref={inputRef} onInputChange={handleInputChange} />
                 </div>
                 <div className='w-[50%]'>
                   <GanpanImage images={ganpanResult} averageWidth={averageWidth} /></div>
