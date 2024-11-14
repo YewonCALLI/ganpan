@@ -1,6 +1,13 @@
 import React, { useCallback, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 
-const Input = forwardRef((props, ref) => {
+interface InputProps {
+    onInputChange: (value: string) => void;
+}
+interface InputRef {
+    handleReset: () => void;
+}
+
+const Input = forwardRef<InputRef, InputProps>((props, ref) => {
     const { onInputChange } = props;
     const [inputValue, setInputValue] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -24,7 +31,7 @@ const Input = forwardRef((props, ref) => {
                 setErrorMessage(`최대 ${maxChars}자까지만 입력할 수 있습니다.`);
             }
         },
-        []);
+        [onInputChange]);
 
 
     return (
@@ -47,3 +54,4 @@ const Input = forwardRef((props, ref) => {
 });
 
 export default Input;
+Input.displayName = 'Input';

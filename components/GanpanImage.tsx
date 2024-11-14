@@ -8,31 +8,41 @@ const gothicA1 = Gothic_A1({
     subsets: ['latin'],
     display: 'swap',
 });
+
+interface ImageData {
+    fk_parent_id: number;
+    public_url: string;
+    file_name: string;
+}
+type RowItem = ImageData | string;
+
 interface GanpanImageProps {
-    images: ImageData[];
+    images: (ImageData | { file_name: string })[];
     averageWidth: number;
 }
+
 const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
     const containerRef = useRef<(HTMLDivElement | null)[]>([]);
     const [tmpParentImage, setTmpParentImage] = useState<string>();
-    const [parentImage, setParentImage] = useState<string>();
+    const [parentImage, setParentImage] = useState<string | null>();
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
 
 
-    const groupImagesByRow = (images: ImageData[]) => {
-        const rows: ImageData[][] = [];
-        let currentRow: ImageData[] = [];
+    const groupImagesByRow = (images: (ImageData | { file_name: string })[]): RowItem[][] => {
+        console.log("get: ", images);
+
+        const rows: RowItem[][] = [];
+        let currentRow: RowItem[] = [];
 
         images.forEach((image) => {
-            if (image?.public_url) {
+            if ('fk_parent_id' in image) {
                 currentRow.push(image);
-
-            } else {
-                if (image?.file_name) {
-                    currentRow.push(image?.file_name);
-                }
-                else {
+            } else if ('file_name' in image) {
+                // file_name만 있는 경우
+                if (image.file_name !== "") {
+                    currentRow.push(image.file_name);
+                } else {
                     if (currentRow.length > 0) {
                         rows.push(currentRow);
                         currentRow = [];
@@ -41,14 +51,16 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
             }
         });
 
+
+
         if (currentRow.length > 0) {
             rows.push(currentRow);
         }
-
+        console.log('result: ', rows);
         return rows;
     };
 
-
+    //================== 클릭 시 부모 사진이 뜬다. ========================
     // 클릭 시 original photo를 렌더링하는 부분
     useEffect(() => {
         const convertImage = async () => {
@@ -85,7 +97,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
         await fetchParentImages(Number(id));
     }
 
-    async function convertHEICToJPEG(url: string) {
+    async function convertHEICToJPEG(url: string): Promise<string | null> {
         try {
             // HEIC 파일을 fetch
             const response = await fetch(url);
@@ -99,7 +111,12 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
             });
 
             // 변환된 이미지의 URL 생성
-            return URL.createObjectURL(jpegBlob);
+            if (jpegBlob instanceof Blob) {
+                return URL.createObjectURL(jpegBlob);
+            } else if (Array.isArray(jpegBlob) && jpegBlob.length > 0) {
+                return URL.createObjectURL(jpegBlob[0]);
+            }
+            return null;
         } catch (error) {
             console.error('Error converting HEIC to JPEG:', error);
             return null;
@@ -113,7 +130,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-            }} ref={containerRef}><div style={{
+            }} ref={(el) => containerRef.current[0]}><div style={{
                 width: `${averageWidth * 500}px`,
                 maxWidth: '652px',
             }}>
@@ -139,11 +156,10 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                                                 backgroundColor: '#f0f0f0'  // 텍스트 배경색 지정
                                             }}
                                         >
-                                            <span className={`text-lg text-center p-4 text-9xl ${gothicA1.className}`}>{image}</span>
+                                            <span className={` text-center p-4 text-9xl ${gothicA1.className}`}>{image}</span>
                                         </div>
                                     );
                                 }
-
                                 // 이미지인 경우 기존 렌더링
                                 return (
                                     <div
@@ -152,14 +168,14 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                                         style={{
                                             width: `${100 / row.length}%`,
                                             flexGrow: 1,
-                                            border: selectedImageId === image.fk_parent_id ? '10px solid #00D5FF' : 'none',
+                                            border: selectedImageId === image?.fk_parent_id ? '10px solid #00D5FF' : 'none',
                                             transition: 'border 0.3s ease'
                                         }}
                                         onClick={() => handleParentClick(image.fk_parent_id)}
                                     >
                                         <img
-                                            src={image.public_url}
-                                            alt={image.file_name}
+                                            src={image?.public_url}
+                                            alt={image?.file_name}
                                             className="h-full w-full object-fit"
                                         />
                                     </div>
