@@ -21,7 +21,7 @@ interface SaveResult {
 }
 function Page2() {
   const [ganpanResult, setGanpanResult] = useState(null);
-  const [averageWidth, setAverageWidth] = useState(null);
+  const [averageWidth, setAverageWidth] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -126,8 +126,8 @@ function Page2() {
             <p>글자를 클릭하여 출처를 확인해 보세요.</p>
           </div>
           <div className="result">
-            <div ref={containerRef} id="generated-image" className='h-[full] flex items-center'>
-              {ganpanResult && <GanpanImage images={ganpanResult} averageWidth={averageWidth} />}
+            <div id="generated-image" className='h-[full] flex items-center'>
+              {ganpanResult && <GanpanImage images={ganpanResult} averageWidth={averageWidth} ref={containerRef} />}
             </div>
           </div>
           <div className="page2-buttons">
