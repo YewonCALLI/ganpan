@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, forwardRef } from 'react';
 import heic2any from 'heic2any';
 import { Gothic_A1 } from 'next/font/google'
 import { Loader2 } from "lucide-react"; // lucide-react의 로딩 아이콘 사용
@@ -21,8 +21,10 @@ interface GanpanImageProps {
     averageWidth: number;
 }
 
-const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
-    const containerRef = useRef<(HTMLDivElement | null)[]>([]);
+const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) => {
+
+    const { images, averageWidth } = props;
+
     const [tmpParentImage, setTmpParentImage] = useState<string>();
     const [parentImage, setParentImage] = useState<string | null>();
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
@@ -130,17 +132,19 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-            }} ref={(el) => containerRef.current[0]}><div style={{
-                width: `${averageWidth * 500}px`,
-                maxWidth: '652px',
-            }}>
+            }}> <div ref={ref}
+                style={{
+                    width: `${averageWidth * 500}px`,
+                    maxWidth: '652px',
+                }}>
                     {groupImagesByRow(images).map((row, rowIndex) => (
                         <div
                             key={rowIndex}
                             className='flex'
                             style={{
                                 width: '100%',
-                                marginBottom: '1px' // 줄 간격
+                                marginBottom: '1px',// 줄 간격
+
                             }}
                         >
                             {row.map((image, imageIndex) => {
@@ -202,6 +206,7 @@ const GanpanImage = ({ images, averageWidth }: GanpanImageProps) => {
             </div>
         </div>
     );
-};
+});
+
 
 export default GanpanImage;
