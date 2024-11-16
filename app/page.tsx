@@ -62,7 +62,12 @@ function Page1() {
     let newEnterPositions: number[] = [];
     let currentPosition = 0;
     let wordLengths: number[] = [];
-
+    // ?63
+    // : 58
+    //   126 ~
+    // . 46
+    //   " 34
+    //   !33
     words.forEach((word, wordIndex) => {
       if (word.length > 0) {
         wordLengths.push(word.length);
@@ -74,6 +79,30 @@ function Page1() {
           } else if (char === "닭") {
             processedList.push("dalg");
             hanguelList.push('닭');
+          } else if (char === "찮") {
+            processedList.push("chanh");
+            hanguelList.push('찮');
+          } else if (char === "의") {
+            processedList.push("ui");
+            hanguelList.push('의');
+          } else if (char === "?") {
+            processedList.push("63");
+            hanguelList.push('?');
+          } else if (char === "!") {
+            processedList.push("33");
+            hanguelList.push('!');
+          } else if (char === ":") {
+            processedList.push("58");
+            hanguelList.push(':');
+          } else if (char === ".") {
+            processedList.push("46  ");
+            hanguelList.push('.');
+          } else if (char === "~") {
+            processedList.push("126");
+            hanguelList.push('~');
+          } else if (char === '"') {
+            processedList.push("34");
+            hanguelList.push('"');
           } else {
             processedList.push(Aromanize.romanize(char));
             hanguelList.push(char);

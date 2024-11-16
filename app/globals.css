@@ -67,3 +67,9 @@
     @apply bg-background text-foreground;
   }
 }
+@font-face {
+  font-family: "headline";
+  src: url("../public/fonts/hy헤드라인m-yoond1004.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
