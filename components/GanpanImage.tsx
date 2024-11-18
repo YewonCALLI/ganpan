@@ -44,7 +44,6 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
 
 
     const groupImagesByRow = (images: (ImageData | { file_name: string })[]): RowItem[][] => {
-        console.log("get: ", images);
 
         const rows: RowItem[][] = [];
         let currentRow: RowItem[] = [];
@@ -70,7 +69,6 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
         if (currentRow.length > 0) {
             rows.push(currentRow);
         }
-        console.log('result: ', rows);
         return rows;
     };
 
@@ -118,6 +116,7 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
             // HEIC 파일을 fetch
             const response = await fetch(url);
             const blob = await response.blob();
+
 
             // HEIC를 JPEG로 변환
             const jpegBlob = await heic2any({

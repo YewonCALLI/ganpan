@@ -28,8 +28,6 @@ async function uploadImageUrlsToTable() {
           .getPublicUrl(file.name)
         
         const publicUrl = data.publicUrl
-        console.log('url',publicUrl);
-        console.log(file.name);
       
         if(file.name.includes("-")){
           // const parent = file.name.split("-")[0];
@@ -49,9 +47,6 @@ async function uploadImageUrlsToTable() {
           // ])
         }
         if(!file.name.includes("-")){
-          
-          console.log('hey~');
-          
             // Insert the public URL into the database
           const { data: insertData, error: insertError } = await supabase
           .from('parent_image_gallery')
@@ -68,7 +63,6 @@ async function uploadImageUrlsToTable() {
         results.push(`Uploaded URL for ${file.name}`)
       }
     }
-    // console.log(files.length);
     
     return { success: true, message: 'All image URLs have been uploaded to the table.', files }
 

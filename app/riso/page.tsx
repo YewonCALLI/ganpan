@@ -29,8 +29,6 @@ const Page = () => {
     // 컴포넌트 마운트 시 이미지 가져오기
     useEffect(() => {
         fetchAllImages();
-        console.log(images);
-
     }, []);
 
     // 셀 크기 계산

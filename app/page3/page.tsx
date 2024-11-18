@@ -28,13 +28,12 @@ const ThreeJSScene = () => {
 
   const cameraTargetYRef = useRef<number>(10);
 
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<(string | null)[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const urls = await fetchImageUrls();
       setImageUrls(urls);
-      // console.log('Image URLs:', urls);
     };
 
     fetchData();
@@ -139,8 +138,10 @@ const ThreeJSScene = () => {
     const targetPositions = generateTargetPositions();
 
     imageUrls.forEach((url, i) => {
-      const position = targetPositions[i] || targetPositions[targetPositions.length - 1];
-      createPlane(url, position);
+      if (url) { // null 체크 추가
+        const position = targetPositions[i] || targetPositions[targetPositions.length - 1];
+        createPlane(url, position);
+      }
     });
 
     const onDocumentMouseMove = (event: MouseEvent) => {
