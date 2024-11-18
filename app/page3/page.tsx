@@ -380,7 +380,7 @@ const ThreeJSScene = () => {
     <div style={{ height: '100vh', position: 'relative' }}>
       <div
         ref={mountRef}
-        style={{ position: 'absolute', width: '100vw', height: '100vh', backgroundColor: '#f0f0f0' }}
+        style={{ position: 'absolute', width: '100vw', height: '100vh', backgroundColor: '#fff' }}
       />
 
       {selectedImageURL && (

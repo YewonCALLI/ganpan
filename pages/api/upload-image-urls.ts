@@ -21,8 +21,6 @@ async function uploadImageUrlsToTable() {
     for (const file of files) {
       
       if (file.name.match(/\.(jpg|jpeg|JPG|png|gif|HEIC)$/i)) {
-      
-        
         // Generate public URL for the file
         const { data } = supabase
           .storage
@@ -34,23 +32,24 @@ async function uploadImageUrlsToTable() {
         console.log(file.name);
       
         if(file.name.includes("-")){
-          const parent = file.name.split("-")[0];
-          const tmp = file.name.split("-")[2];
-          const last = tmp.split(".")[0]
+          // const parent = file.name.split("-")[0];
+          // const tmp = file.name.split("-")[2];
+          // const last = tmp.split(".")[0]
           
-          // Insert the public URL into the database
-          const { data: insertData, error: insertError } = await supabase
-          .from('image_gallery')
-          .insert([
-            { 
-              file_name: file.name, 
-              public_url: publicUrl,
-              fk_parent_id : parent,
-              character:last,
-            }
-          ])
+          // // Insert the public URL into the database
+          // const { data: insertData, error: insertError } = await supabase
+          // .from('image_gallery')
+          // .insert([
+          //   { 
+          //     file_name: file.name, 
+          //     public_url: publicUrl,
+          //     fk_parent_id : parent,
+          //     character:last,
+          //   }
+          // ])
         }
         if(!file.name.includes("-")){
+          
           console.log('hey~');
           
             // Insert the public URL into the database
