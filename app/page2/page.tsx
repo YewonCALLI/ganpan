@@ -83,7 +83,6 @@ function Page2() {
         });
 
         const result = await response.json();
-        console.log('Upload result:', result);
 
         return {
           success: true,

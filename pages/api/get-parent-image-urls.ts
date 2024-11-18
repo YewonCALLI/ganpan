@@ -23,7 +23,6 @@ async function getImageUrls(parentId : number) {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     const {input} = req.query
-    // console.log(input, typeof(input));
     
     const result = await getImageUrls(Number(input));
     if (result.success) {

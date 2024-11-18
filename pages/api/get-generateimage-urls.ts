@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import getImageUrl from '@/utils/supabase/storage';
 import supabase from '@/utils/supabase/supabaseClient'
 
-export const fetchImageUrls = async (): Promise<string[]> => {
+export const fetchImageUrls = async (): Promise<(string|null)[]> => {
     const { data, error } = await supabase
       .from('generated_image')
       .select('public_url'); 
@@ -13,7 +13,7 @@ export const fetchImageUrls = async (): Promise<string[]> => {
     }
   
     if (data) {
-      return data.map((item) => item.public_url);
+      return data.map((item) => item!.public_url);
     }
   
     return [];
