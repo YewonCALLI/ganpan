@@ -3,6 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm,Fields, Files, File } from 'formidable';
 import supabase from '@/utils/supabase/supabaseClient';
 
+interface GeneratedImage{
+    id?:number;
+    created_at?:string;
+    public_url:string;
+}
 export const config = {
     api: {
         bodyParser: false,
@@ -78,9 +83,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // DB에 URL 저장
         const { data: insertData, error: insertError } = await supabase
             .from('generated_image')
-            .insert([{ 
+            .insert({
                 public_url: urlData.publicUrl,
-            }]);
+            });
 
         if (insertError) {
             console.error('DB insert error:', insertError);

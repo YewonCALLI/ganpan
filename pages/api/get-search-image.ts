@@ -3,7 +3,7 @@ import getImageUrl from '@/utils/supabase/storage';
 import supabase from '@/utils/supabase/supabaseClient'
 
 async function getSearchedImageUrls(input:string) {
-  const results = [];
+  const results:any = [];
   
   try {
     const { data: image_gallery, error } = await supabase
