@@ -9,6 +9,14 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "neurimboGothicRegular";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/neurimboGothicRegular.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
 .webgl {
   position: relative;
   top: 0;
