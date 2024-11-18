@@ -38,8 +38,11 @@ const ThreeJSScene = () => {
 
     fetchData();
   }, []);
+  const isBrowser = typeof window !== 'undefined';
 
   useEffect(() => {
+    if (!isBrowser) return;
+
     if (imageUrls.length === 0 || !mountRef.current) return;
 
     const scene = new THREE.Scene();
