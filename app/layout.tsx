@@ -11,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "GANPAN by NEWZINE",
+  title: "GANPAN by NEWZINE💈",
   description: "bomi and yewon is another level",
 };
 
