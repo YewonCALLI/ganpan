@@ -227,7 +227,7 @@ function Page1() {
                                 <div className="font1">
                                 </div>
                                 <div className="font1-1" onClick={handleGenerateButton}>
-                                    <button>다시 ♽️</button>
+                                    <button>다른 간판 ♽️</button>
                                 </div>
                             </div>
                             <div className="top-container">
@@ -240,7 +240,13 @@ function Page1() {
                         </div>
                     </div>
                 </div>
+                <div className='flex w-[90%] justify-start relative '>
+                    <div className='absolute text-slate-500 mt-6 text-base'>
+                        1. 텍스트 입력   ⇒   2. <div className='border-2 border-[#00D5FF] inline'>생성 ▶️</div> 버튼 클릭   ⇒   3. <div className='border-2 border-[#00D5FF] inline'>완성했어요!</div> 클릭 <br />
+                        * 다른 디자인을 원하면 <div className='border-2 border-[#00D5FF] inline'>다른 간판 ♽️</div> 클릭
+                    </div>
 
+                </div>
                 <div className="complete_icon">
                     <Image
                         src={completeicon}
@@ -256,7 +262,8 @@ function Page1() {
                 </div>
             </div>
         </>
-    );
-}
+    )
+};
+
 
 export default Page1;
