@@ -173,14 +173,14 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
                 style={{
                     width: `${100 / rowLength}%`,
                     flexGrow: 1,
-                    border: selectedImageId === image.fk_parent_id ? '10px solid #00D5FF' : 'none',
+                    border: selectedImageId === image?.fk_parent_id ? '10px solid #00D5FF' : 'none',
                     transition: 'border 0.3s ease'
                 }}
                 onClick={() => handleParentClick(image.fk_parent_id)}
             >
                 <img
-                    src={image.public_url}
-                    alt={image.file_name}
+                    src={image?.public_url}
+                    alt={image?.file_name}
                     className="h-full w-full object-fit"
                     loading="lazy"
                 />
