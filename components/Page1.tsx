@@ -32,6 +32,7 @@ function Page1() {
     const [hanguelInput, setHanguelInput] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('ATC 2024');
     const [processedInputs, setProcessedInputs] = useState<string[]>([]);  // 저장할 processedInputs 추가
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const router = useRouter();
     const inputRef = useRef<InputRef>(null);
@@ -130,6 +131,8 @@ function Page1() {
 
     const handleGenerateButton = async (e?: React.MouseEvent) => {
         if (!inputValue) return; // inputValue가 없으면 아무것도 하지 않음
+        setIsGenerating(true);
+
         setGanpanResult([]); // 결과 초기화
 
         // 입력값 처리 후 processedInputs와 enterPositions 상태에 기반하여 이미지를 생성
@@ -194,6 +197,8 @@ function Page1() {
                 });
 
                 setGanpanResult(refinedResults);
+
+                setIsGenerating(false);
             };
 
             generateResults();
@@ -234,8 +239,17 @@ function Page1() {
                                 <div className='additional-container'>
                                     <Input ref={inputRef} onInputChange={handleInputChange} />
                                 </div>
-                                <div className='w-[50%]'>
-                                    <GanpanImage images={ganpanResult} averageWidth={averageWidth} /></div>
+                                <div className='w-[50%] relative'>
+                                    {isGenerating && (
+                                        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-12 h-12 rounded-full border-4 border-[#00D5FF] border-t-transparent animate-spin"></div>
+                                                <p className="mt-4 text-[#00D5FF] font-medium">간판 생성중...</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <GanpanImage images={ganpanResult} averageWidth={averageWidth} />
+                                </div>
                             </div>
                         </div>
                     </div>
