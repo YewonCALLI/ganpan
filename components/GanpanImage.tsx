@@ -3,6 +3,8 @@ import heic2any from 'heic2any';
 import { Gothic_A1, Dongle } from 'next/font/google'
 import { Loader2 } from "lucide-react"; // lucide-react의 로딩 아이콘 사용
 import localFont from 'next/font/local'
+import { image } from 'html2canvas/dist/types/css/types/image';
+
 const gothicA1 = Gothic_A1({
     weight: ['400', '700'], // 필요한 weight 추가
     subsets: ['latin'],
@@ -14,7 +16,7 @@ const gothicA1 = Gothic_A1({
 const headlineFont = localFont({
     src: [
         {
-            path: "../public/fonts/hy헤드라인m-yoond1004.ttf",
+            path: "../public/fonts/HeadlineAM.ttf",
             weight: '400',
             style: 'normal',
         },
@@ -41,7 +43,7 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
     const [parentImage, setParentImage] = useState<string | null>();
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
-
+    const [colorMap, setColorMap] = useState<{ [key: number]: { bg: string, text: string } }>({});
 
     const groupImagesByRow = (images: (ImageData | { file_name: string })[]): RowItem[][] => {
 
@@ -141,7 +143,7 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
     // 컴포넌트 외부에 색상 배열 정의
     const BACKGROUND_COLORS = [
         '#E71D36', '#2EC4B6', '#FF9F1C', '#4464AD', '#FFD93D',
-        '#6B5B95', '#2B50AA', '#FF6B6B', '#4ECDC4', '#45B7D1',
+        '#6B5B95', '#2B50AA', '#FF6B6B', '#4ECDC4',
         '#FF8427', '#1A5F7A', '#D62828', '#034748', '#119DA4'
     ];
 
@@ -151,13 +153,18 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
         '#FFF0F6', '#F8F0FC'
     ];
 
-    // 색상 선택을 위한 유틸리티 함수
-    const getRandomColor = (colors: string[]) => {
-        return colors[Math.floor(Math.random() * colors.length)];
-    };
+    useEffect(() => {
+        const newColorMap: { [key: number]: { bg: string, text: string } } = {};
 
-    // 메모이제이션된 색상 값을 저장할 객체
-    const colorCache: { [key: number]: { bg: string, text: string } } = {};
+        images.forEach((_, index) => {
+            newColorMap[index] = {
+                bg: BACKGROUND_COLORS[Math.floor(Math.random() * BACKGROUND_COLORS.length)],
+                text: TEXT_COLORS[Math.floor(Math.random() * TEXT_COLORS.length)]
+            };
+            setColorMap(newColorMap)
+        })
+    }, [images.length])
+
     return (
         <div className='flex gap-3'>
             <div style={{
@@ -191,18 +198,18 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
                                             style={{
                                                 width: `${100 / row.length}%`,
                                                 flexGrow: 1,
-                                                backgroundColor: colorCache[imageIndex]?.bg ||
-                                                    (colorCache[imageIndex] = {
-                                                        bg: getRandomColor(BACKGROUND_COLORS),
-                                                        text: getRandomColor(TEXT_COLORS)
-                                                    }).bg
+                                                backgroundColor: colorMap[imageIndex]?.bg || BACKGROUND_COLORS[0]
                                             }}
                                         >
                                             <span
-                                                className={`text-center p-4 text-[200px] font-bold ${headlineFont.className}`}
+                                                className={`text-center p-4 text-[200px] font-bold `}
                                                 style={{
-                                                    color: colorCache[imageIndex]?.text,
-                                                    fontWeight: 'bold'
+                                                    color: colorMap[imageIndex]?.text || TEXT_COLORS[0],
+                                                    fontWeight: 'bold',
+                                                    fontSize: `${Math.min(150, (100 / row.length) * 8)}px`, // 텍스트 크기 좀 더 작은 값으로 설정
+                                                    lineHeight: '1', // line-height 값을 1로 유지
+                                                    textOverflow: 'ellipsis', // 텍스트가 넘치지 않도록 처리
+                                                    whiteSpace: 'nowrap', // 텍스트가 줄바꿈 없이 한 줄로 처리되도록 설정
                                                 }}
                                             >
                                                 {image}
