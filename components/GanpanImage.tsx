@@ -22,12 +22,15 @@ interface GanpanImageProps {
 }
 
 const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) => {
+
     const { images, averageWidth } = props;
     const [tmpParentImage, setTmpParentImage] = useState<string>();
     const [parentImage, setParentImage] = useState<string | null>();
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [colorMap, setColorMap] = useState<{ [key: number]: { bg: string, text: string } }>({});
+
+
 
     const BACKGROUND_COLORS = [
         '#E71D36', '#2EC4B6', '#FF9F1C', '#4464AD', '#FFD93D',
@@ -210,7 +213,7 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center">
                         <Loader2 className="w-12 h-12 animate-spin text-[#00D5FF]" />
-                        <span className={`mt-2 text-[#00D5FF] ${gothicA1.className}`}>
+                        <span className={`mt - 2 text - [#00D5FF] ${gothicA1.className} `}>
                             이미지를 불러오는 중...
                         </span>
                     </div>
@@ -223,8 +226,9 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
                     />
                 ) : null}
             </div>
-        </div>
-    );
+        </div >
+
+    )
 });
 
 export default React.memo(GanpanImage);
