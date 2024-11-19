@@ -132,35 +132,43 @@ function Page1() {
     const handleGenerateButton = async (e?: React.MouseEvent) => {
         if (!inputValue) return; // inputValue가 없으면 아무것도 하지 않음
         setIsGenerating(true);
+        try {
+            setGanpanResult([]); // 결과 초기화
 
-        setGanpanResult([]); // 결과 초기화
+            // 입력값 처리 후 processedInputs와 enterPositions 상태에 기반하여 이미지를 생성
+            const processedInputs = handleInputText(inputValue);
 
-        // 입력값 처리 후 processedInputs와 enterPositions 상태에 기반하여 이미지를 생성
-        const processedInputs = handleInputText(inputValue);
+            // 이미지 가져오기
+            const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
 
-        // 이미지 가져오기
-        const allResults = await Promise.all(processedInputs.map(fetchSearchedImages));
-
-        // undefined인 결과를 원래 입력값으로 대체
-        const refinedResults = allResults.map((result, index) => {
-            if (!result) {
-                return {
-                    file_name: hanguelInput[index],
-                    public_url: ''
-                };
-            }
-            return result;
-        });
-        // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
-        const positions = [...enterPositions].sort((a: any, b: any) => a - b); // 오름차순 정렬
-        positions.forEach((position, index) => {
-            refinedResults.splice(Number(position) + index, 0, {
-                file_name: '',
-                public_url: ''
+            // undefined인 결과를 원래 입력값으로 대체
+            const refinedResults = allResults.map((result, index) => {
+                if (!result) {
+                    return {
+                        file_name: hanguelInput[index],
+                        public_url: ''
+                    };
+                }
+                return result;
             });
-        });
+            // 공백 위치에 빈 ImageData 객체 삽입 (위치 조정)
+            const positions = [...enterPositions].sort((a: any, b: any) => a - b); // 오름차순 정렬
+            positions.forEach((position, index) => {
+                refinedResults.splice(Number(position) + index, 0, {
+                    file_name: '',
+                    public_url: ''
+                });
+            });
 
-        setGanpanResult(refinedResults);
+            setGanpanResult(refinedResults);
+        }
+        catch (error) {
+            console.error(error);
+
+        } finally {
+            setIsGenerating(false)
+        }
+
     };
 
     const handleInputChange = (input: any) => {
@@ -197,14 +205,16 @@ function Page1() {
                 });
 
                 setGanpanResult(refinedResults);
-
                 setIsGenerating(false);
             };
 
             generateResults();
         }
     }, [enterPositions, averageWidth, processedInputs, hanguelInput]);  // processedInputs가 변경될 때만 실행
-    useEffect(() => { handleGenerateButton() }, [])
+    useEffect(() => {
+        setIsGenerating(true);
+        handleGenerateButton().finally(() => setIsGenerating(false));
+    }, [])
     return (
         <>
             <Header />
