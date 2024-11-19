@@ -9,7 +9,7 @@ interface InputRef {
 
 const Input = forwardRef<InputRef, InputProps>((props, ref) => {
     const { onInputChange } = props;
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState('ATC 2024');
     const [errorMessage, setErrorMessage] = useState('');
     const maxChars = 15;
 
@@ -32,6 +32,8 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
             }
         },
         [onInputChange]);
+
+    useEffect(() => { onInputChange(inputValue) }, [inputValue])
 
 
     return (

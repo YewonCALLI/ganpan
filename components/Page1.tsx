@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 var Aromanize = require("aromanize");
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import '../app/app.css';
 import Image from 'next/image';
@@ -30,7 +30,7 @@ function Page1() {
     const [enterPositions, setEnterPositions] = useState<number[]>([])
     const [averageWidth, setAverageWidth] = useState<number>(0);
     const [hanguelInput, setHanguelInput] = useState<string[]>([]);
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState('ATC 2024');
     const [processedInputs, setProcessedInputs] = useState<string[]>([]);  // 저장할 processedInputs 추가
 
     const router = useRouter();
@@ -128,7 +128,7 @@ function Page1() {
         return processedList;
     };
 
-    const handleGenerateButton = async (e: React.MouseEvent) => {
+    const handleGenerateButton = async (e?: React.MouseEvent) => {
         if (!inputValue) return; // inputValue가 없으면 아무것도 하지 않음
         setGanpanResult([]); // 결과 초기화
 
@@ -199,7 +199,7 @@ function Page1() {
             generateResults();
         }
     }, [enterPositions, averageWidth, processedInputs, hanguelInput]);  // processedInputs가 변경될 때만 실행
-
+    useEffect(() => { handleGenerateButton() }, [])
     return (
         <>
             <Header />
