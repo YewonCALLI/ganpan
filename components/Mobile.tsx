@@ -1,5 +1,5 @@
 import React from 'react';
-import mobileImg from '@/public/dontlook.png'
+import mobileImg from '@/public/dontlook2.png'
 import Image from 'next/image';
 const Mobile = () => {
     return (
