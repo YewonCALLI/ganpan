@@ -44,7 +44,16 @@
   height: 3.9%;
   cursor: pointer;
 }
-
+.header2 {
+  position: fixed;
+  display: flex;
+  top: 3%;
+  left: 2.4%;
+  align-items: center;
+  gap: 10px;
+  height: 3.9%;
+  cursor: pointer;
+}
 .header :hover {
   opacity: 0.85;
 }

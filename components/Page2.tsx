@@ -12,6 +12,7 @@ import sendbutton from '@/Group 14.png';
 import Header from '@/components/Header';
 import html2canvas from 'html2canvas';
 import GanpanImage from '@/components/GanpanImage';
+import BackIcon2 from './BackIcon2';
 
 interface SaveResult {
     success: boolean;
@@ -114,6 +115,7 @@ function Page2() {
         <>
             <Header />
             <div className="page2">
+                <BackIcon2 />
                 <Image
                     src={image1}
                     alt="background"
