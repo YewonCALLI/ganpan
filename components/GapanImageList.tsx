@@ -14,7 +14,7 @@ const GapanImageList = () => {
         fetchData();
     }, []);
     return (
-        <div className='mt-10 w-full flex flex-col justify-center items-center'>
+        <div className='mt-10 w-full flex flex-col-reverse justify-center items-center'>
             {imageUrls.map(url =>
                 <div className='w-[40%] p-10'>
                     <img src={url} alt="생성된 간판" />
