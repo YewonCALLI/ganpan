@@ -8,6 +8,7 @@ import Image from 'next/image';
 import image1 from '@/background.png';
 import pencil from '@/Group 6.svg';
 import Header from '@/components/Header';
+import Hall from '@/components/hallicon';
 import localFont from 'next/font/local';
 import completeicon from '@/Group 12.png';
 import reloadicon from '@/reload.png';
@@ -218,6 +219,7 @@ function Page1() {
     return (
         <>
             <Header />
+            <Hall />
             <Image
                 src={image1}
                 alt="background"
