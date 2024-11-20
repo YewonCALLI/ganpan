@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import '../app/app.css';
+import supabase from '@/utils/supabase/supabaseClient'
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
@@ -11,6 +12,7 @@ import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass';
 import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader';
 import { fetchImageUrls } from '../pages/api/get-generateimage-urls'; // 이미지 URL 가져오기
+import BackIcon from './BackIcon';
 
 interface CustomMesh extends THREE.Mesh {
     userData: {
@@ -37,7 +39,34 @@ const ThreeJSScene = () => {
         };
 
         fetchData();
+
+        const subscription = supabase
+            .channel('realtime:generated_image')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'generated_image' }, (payload) => {
+                console.log('Real-time change:', payload);
+
+                if (payload.eventType === 'INSERT') {
+                    // Add the new image URL
+                    setImageUrls((prev) => [...prev, payload.new.public_url]);
+                } else if (payload.eventType === 'DELETE') {
+                    // Remove the deleted image URL
+                    setImageUrls((prev) => prev.filter((url) => url !== payload.old.public_url));
+                } else if (payload.eventType === 'UPDATE') {
+                    // Update the modified image URL
+                    setImageUrls((prev) =>
+                        prev.map((url) => (url === payload.old.public_url ? payload.new.public_url : url))
+                    );
+                }
+            })
+            .subscribe();
+
+        // Clean up the subscription on unmount
+        return () => {
+            supabase.removeChannel(subscription);
+        };
     }, []);
+
+
     // const isBrowser = typeof window !== 'undefined';
 
     useEffect(() => {
@@ -185,26 +214,45 @@ const ThreeJSScene = () => {
 
         const onDocumentMouseDown = (event: MouseEvent) => {
             event.preventDefault();
-
+        
+            // 디버깅을 위한 로그
+            console.log("Mouse click detected");
+            
             const mouse = new THREE.Vector2();
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
+        
+            console.log("Mouse coordinates:", mouse);
+            
             const raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camera);
-
+            
+            // 현재 plane 개수 확인
+            console.log("Number of planes:", planesRef.current.length);
+            
             const intersects = raycaster.intersectObjects(planesRef.current);
-
+            console.log("Intersects:", intersects);
+        
             if (intersects.length > 0) {
                 const intersectedPlane = intersects[0].object as CustomMesh;
-                const imageURL = intersectedPlane.userData.imageURL;
-                setSelectedImageURL(imageURL || null);
+                console.log("Intersected plane:", intersectedPlane);
+                console.log("Image URL:", intersectedPlane.userData.imageURL);
+        
+                if (intersectedPlane.userData.imageURL) {
+                    setSelectedImageURL(intersectedPlane.userData.imageURL);
+                    console.log("Setting selected image URL:", intersectedPlane.userData.imageURL);
+                } else {
+                    console.warn("No image URL found in userData");
+                }
+            } else {
+                console.log("No intersection detected");
+                setSelectedImageURL(null);
             }
         };
-
+        
         renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
-        renderer.domElement.addEventListener('click', onDocumentMouseDown, false);
+        renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
 
         const drawLines = () => {
             const positionMap = new Map<string, CustomMesh[]>();
@@ -387,22 +435,6 @@ const ThreeJSScene = () => {
                 style={{ position: 'absolute', width: '100vw', height: '100vh', backgroundColor: '#fff' }}
             />
 
-            {selectedImageURL && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        width: '25vw',
-                        overflow: 'auto',
-                        padding: '10px',
-                        right: '0px',
-                        bottom: '0%',
-                        backgroundColor: '#000000',
-                    }}
-                >
-                    <img src={selectedImageURL} style={{ width: '100%' }} alt="Selected" />
-                </div>
-            )}
-
             <div style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}>
                 <input
                     type="range"
@@ -426,6 +458,25 @@ const ThreeJSScene = () => {
                 />
                 <label style={{ marginTop: '20px', color: '#000', display: 'block', textAlign: 'center' }}></label>
             </div>
+
+            {selectedImageURL && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        width: '15vw',
+                        padding: '10px',
+                        bottom: '0%',
+                        right:'0px',
+                        backgroundColor: '#000000',
+                        color: '#fff', // 텍스트 색상 추가
+                        zIndex : 1000,
+                    }}
+                >
+                    <img src={selectedImageURL} style={{ width: '100%' }} alt="Selected" />
+                </div>
+            )}
+            <BackIcon/>
+
         </div>
     );
 };
