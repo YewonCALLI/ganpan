@@ -9,7 +9,7 @@ interface InputRef {
 
 const Input = forwardRef<InputRef, InputProps>((props, ref) => {
     const { onInputChange } = props;
-    const [inputValue, setInputValue] = useState('ATC 2024');
+    const [inputValue, setInputValue] = useState('아자아자 화이팅!');
     const [errorMessage, setErrorMessage] = useState('');
     const maxChars = 15;
 
