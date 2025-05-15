@@ -193,7 +193,7 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
             <div className="flex items-center justify-center">
                 <div ref={ref} style={{
                     width: `${averageWidth * 500}px`,
-                    maxWidth: '652px',
+                    maxWidth: '500px',
                 }}>
                     {groupImagesByRow.map((row, rowIndex) => (
                         <div
@@ -209,7 +209,7 @@ const GanpanImage = forwardRef<HTMLDivElement, GanpanImageProps>((props, ref) =>
                     ))}
                 </div>
             </div>
-            <div className="w-[752px] h-[600px] flex items-center justify-center">
+            <div className="w-[600px] h-[480px] flex items-center justify-center">
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center">
                         <Loader2 className="w-12 h-12 animate-spin text-[#00D5FF]" />

@@ -1,7 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
-var Aromanize = require("aromanize");
-import React, { useState, useRef, useEffect, use } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import '../app/app.css';
 import Image from 'next/image';
@@ -31,12 +30,27 @@ function Page1() {
     const [enterPositions, setEnterPositions] = useState<number[]>([])
     const [averageWidth, setAverageWidth] = useState<number>(0);
     const [hanguelInput, setHanguelInput] = useState<string[]>([]);
-    const [inputValue, setInputValue] = useState('ATC 2024');
+    const [inputValue, setInputValue] = useState('아자아자 화이팅!');
     const [processedInputs, setProcessedInputs] = useState<string[]>([]);  // 저장할 processedInputs 추가
     const [isGenerating, setIsGenerating] = useState(false);
+    const [aromanize, setAromanize] = useState<any>(null); // Aromanize를 상태로 관리
 
     const router = useRouter();
     const inputRef = useRef<InputRef>(null);
+
+    // Aromanize 로드
+    useEffect(() => {
+        const loadAromanize = async () => {
+            try {
+                // @ts-ignore - aromanize 타입 정의가 없음
+                const module = await import('aromanize');
+                setAromanize(module.default || module);
+            } catch (error) {
+                console.error('Failed to load Aromanize:', error);
+            }
+        };
+        loadAromanize();
+    }, []);
 
     const handleAverageWidth = (average: number) => {
         setAverageWidth(average);
@@ -57,6 +71,11 @@ function Page1() {
     };
 
     const handleInputText = (input: string) => {
+        // Aromanize가 로드되지 않았으면 빈 배열 반환
+        if (!aromanize) {
+            console.warn('Aromanize not loaded yet');
+            return [];
+        }
 
         const words = input.split(' ');
         let processedList: string[] = [];
@@ -97,7 +116,7 @@ function Page1() {
                         processedList.push("58");
                         hanguelList.push(':');
                     } else if (char === ".") {
-                        processedList.push("46  ");
+                        processedList.push("46");
                         hanguelList.push('.');
                     } else if (char === "~") {
                         processedList.push("126");
@@ -106,7 +125,12 @@ function Page1() {
                         processedList.push("34");
                         hanguelList.push('"');
                     } else {
-                        processedList.push(Aromanize.romanize(char));
+                        try {
+                            processedList.push(aromanize.romanize(char));
+                        } catch (error) {
+                            console.error('Romanize error:', error);
+                            processedList.push(char); // 에러 시 원본 문자 사용
+                        }
                         hanguelList.push(char);
                     }
                 });
@@ -131,7 +155,7 @@ function Page1() {
     };
 
     const handleGenerateButton = async (e?: React.MouseEvent) => {
-        if (!inputValue) return; // inputValue가 없으면 아무것도 하지 않음
+        if (!inputValue || !aromanize) return; // aromanize 체크 추가
         setIsGenerating(true);
         try {
             setGanpanResult([]); // 결과 초기화
@@ -178,6 +202,8 @@ function Page1() {
 
     // useEffect를 통해 상태 변경 후 처리할 작업
     useEffect(() => {
+        if (!processedInputs || processedInputs.length === 0) return;
+        
         setGanpanResult([]); // 결과 초기화
 
         // enterPositions와 averageWidth가 업데이트되었을 때만 이미지 결과를 생성
@@ -212,10 +238,15 @@ function Page1() {
             generateResults();
         }
     }, [enterPositions, averageWidth, processedInputs, hanguelInput]);  // processedInputs가 변경될 때만 실행
+    
+    // 초기 로드 시 aromanize가 준비되면 실행
     useEffect(() => {
-        setIsGenerating(true);
-        handleGenerateButton().finally(() => setIsGenerating(false));
-    }, [])
+        if (aromanize) {
+            setIsGenerating(true);
+            handleGenerateButton().finally(() => setIsGenerating(false));
+        }
+    }, [aromanize]); // aromanize가 로드되면 실행
+    
     return (
         <>
             <Header />
@@ -239,17 +270,23 @@ function Page1() {
                                     <p>최대 15자까지 가능해요.</p>
                                 </div>
                                 <div className="font1-1" onClick={handleGenerateButton}>
-                                    <button>생성 ▶️</button>
+                                    <button disabled={!aromanize}>생성 ▶️</button>
                                 </div>
                                 <div className="font1">
                                 </div>
                                 <div className="font1-1" onClick={handleGenerateButton}>
-                                    <button>다른 간판 ♽️</button>
+                                    <button disabled={!aromanize}>다른 간판 ♽️</button>
                                 </div>
                             </div>
                             <div className="top-container">
                                 <div className='additional-container'>
                                     <Input ref={inputRef} onInputChange={handleInputChange} />
+                                    <div className='flex w-[90%] justify-start relative '>
+                                        <div className='text-slate-500 mt-6 text-base'>
+                                            1. 텍스트 입력   ⇒   2. <div className='border-2 border-[#00D5FF] inline'>생성 ▶️</div> 버튼 클릭   ⇒   3. <div className='border-2 border-[#00D5FF] inline'>완성했어요!</div> 클릭 <br />
+                                            * 다른 디자인을 원하면 <div className='border-2 border-[#00D5FF] inline'>다른 간판 ♽️</div> 클릭
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className='w-[50%] relative'>
                                     {isGenerating && (
@@ -266,13 +303,7 @@ function Page1() {
                         </div>
                     </div>
                 </div>
-                <div className='flex w-[90%] justify-start relative '>
-                    <div className='absolute text-slate-500 mt-6 text-base'>
-                        1. 텍스트 입력   ⇒   2. <div className='border-2 border-[#00D5FF] inline'>생성 ▶️</div> 버튼 클릭   ⇒   3. <div className='border-2 border-[#00D5FF] inline'>완성했어요!</div> 클릭 <br />
-                        * 다른 디자인을 원하면 <div className='border-2 border-[#00D5FF] inline'>다른 간판 ♽️</div> 클릭
-                    </div>
-
-                </div>
+                
                 <div className="complete_icon">
                     <Image
                         src={completeicon}
