@@ -29,6 +29,8 @@ const ThreeJSScene = () => {
     const [selectedImageURL, setSelectedImageURL] = useState<string | null>(null);
 
     const cameraTargetYRef = useRef<number>(10);
+    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+    const zoomLevelRef = useRef<number>(1);
 
     const [imageUrls, setImageUrls] = useState<(string | null)[]>([]);
 
@@ -85,13 +87,15 @@ const ThreeJSScene = () => {
             0.1,
             1000
         );
+        cameraRef.current = camera;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true });
         renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
 
         mountRef.current.appendChild(renderer.domElement);
 
-        camera.position.set(20, 0, 20);
+        camera.position.set(0, 0, 30);
+        // Remove camera.lookAt() - camera will now face forward (negative Z direction)
 
         const loader = new THREE.TextureLoader();
 
@@ -254,6 +258,27 @@ const ThreeJSScene = () => {
         renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
 
+        // 마우스 휠 이벤트 핸들러 추가
+        const onDocumentMouseWheel = (event: WheelEvent) => {
+            event.preventDefault();
+            
+            // 휠 스크롤값에 따라 줌 조정
+            const delta = event.deltaY > 0 ? 1.1 : 0.9;
+            zoomLevelRef.current *= delta;
+            
+            // 줌 레벨 제한 (너무 가깝거나 멀어지지 않도록)
+            zoomLevelRef.current = Math.max(0.1, Math.min(5, zoomLevelRef.current));
+            
+            // FOV 조정
+            if (cameraRef.current) {
+                const baseFOV = 75;
+                cameraRef.current.fov = baseFOV / zoomLevelRef.current;
+                cameraRef.current.updateProjectionMatrix();
+            }
+        };
+
+        renderer.domElement.addEventListener('wheel', onDocumentMouseWheel, { passive: false });
+
         const drawLines = () => {
             const positionMap = new Map<string, CustomMesh[]>();
 
@@ -391,8 +416,9 @@ const ThreeJSScene = () => {
                 buildingGroup.rotation.y += 0.005;
             }
 
+            // Y축 이동은 그대로 유지하지만, lookAt은 제거
             camera.position.y += (cameraTargetYRef.current - camera.position.y) * 0.05;
-            camera.lookAt(0, 15, 0);
+            // camera.lookAt(0, 15, 0); // 이 줄을 제거!
 
             renderer.setClearColor(0xffffff, 0);
             // renderer.render(scene, camera);
@@ -416,6 +442,7 @@ const ThreeJSScene = () => {
             window.removeEventListener('resize', handleResize);
             renderer.domElement.removeEventListener('mousemove', onDocumentMouseMove, false);
             renderer.domElement.removeEventListener('click', onDocumentMouseDown, false);
+            renderer.domElement.removeEventListener('wheel', onDocumentMouseWheel, false);
             cancelAnimationFrame(animationFrameId);
             if (mountRef.current) {
                 mountRef.current.removeChild(renderer.domElement);
